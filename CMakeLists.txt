@@ -35,7 +35,13 @@ if ("$ENV{ROS_VERSION}" STREQUAL "1")
 elseif ("$ENV{ROS_VERSION}" STREQUAL "2")
   # Load as a ROS2 project
   # In this mode, introspection is available for the C++ lib and ROS2 interface
-  # TODO(victorr): Populate this once the ROS2 interface is under construction
+  # NOTE: Only used for IDE introspection, never by colcon. colcon identifies
+  #       packages by crawling for package.xml/CMakeLists.txt files and prunes
+  #       the subtree below any it finds, so it never reads this file at all.
+
+  # ROS interfaces and tooling
+  add_subdirectory(interfaces/ros2/wavemap_ros2)
+  add_subdirectory(interfaces/ros2/wavemap_msgs_ros2)
 
 else ()
   # Load in pure CMake mode
