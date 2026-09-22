@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
 <package format="3">
-  <name>wavemap_all_ros2</name>
+  <name>wavemap_ros_conversions_ros2</name>
   <version>2.2.1</version>
-  <description>Metapackage that builds all wavemap ROS 2 packages.</description>
+  <description>Conversions between wavemap and ROS 2 types.</description>
 
   <maintainer email="akhilmjohn@gmail.com">Akhil John</maintainer>
   <license>BSD</license>
@@ -12,9 +12,15 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <exec_depend>wavemap_ros2</exec_depend>
-  <exec_depend>wavemap_msgs_ros2</exec_depend>
-  <exec_depend>wavemap_ros_conversions_ros2</exec_depend>
+  <depend>wavemap_ros2</depend>
+  <depend>wavemap_msgs_ros2</depend>
+
+  <depend>rclcpp</depend>
+  <depend>geometry_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>yaml_cpp_vendor</depend>
+
+  <test_depend>ament_cmake_gtest</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
