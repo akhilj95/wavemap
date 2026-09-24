@@ -1,0 +1,65 @@
+<launch>
+  <!-- General arguments -->
+  <!-- NOTE: ROS1's default pointed at config/wavemap_server.yaml, which
+             does not exist. Left empty here, which the node rejects. It
+             cannot be a required arg: ROS2 only counts required args passed
+             explicitly by an include, not ones inherited from the parent. -->
+  <arg name="param_file"
+       default=""
+       description="Name of the file from which to read wavemap's server params."/>
+  <arg name="debug_mode"
+       default="false"
+       description="Run the mapper in a debugger (gdb)."/>
+  <!-- NOTE: Off by default until the wavemap RViz2 plugin is ported. -->
+  <arg name="show_rviz"
+       default="false"
+       description="Automatically launch Rviz."/>
+  <arg name="rviz_config"
+       default="$(find-pkg-share wavemap_ros_ros2)/config/rviz/default.rviz"/>
+
+  <!-- Dataset params -->
+  <arg name="rosbag_path"
+       default=""
+       description="Replay the rosbag(s) at the specified path(s), separated by spaces. Can be left blank."/>
+  <!-- NOTE: Relative paths will be resolved w.r.t. ROS_HOME (default ~/.ros) -->
+  <arg name="rosbag_skip_first_n_sec"
+       default="0"
+       description="Skip the first n seconds of the rosbag."/>
+
+  <!-- ROS1 set the global /use_sim_time when replaying a rosbag. ROS2 has no
+       global params, so it is passed to every node below instead. -->
+  <let name="use_sim_time" value="$(eval '\'$(var rosbag_path)\' != \'\'')"/>
+  <!-- ROS1 nodes ran in ROS_HOME, so relative rosbag paths resolved there.
+       ROS2 processes run in the launching shell's directory instead. -->
+  <let name="ros_home" value="$(env ROS_HOME $(env HOME)/.ros)"/>
+
+  <!-- Play the rosbag if a path was specified -->
+  <!-- NOTE: shell="true" so that each bag becomes its own -i argument. -->
+  <executable name="player"
+              cmd="ros2 bag play --rate 1.0 --start-offset $(var rosbag_skip_first_n_sec) --clock 100 --disable-keyboard-controls $(eval '\' \'.join(\'-i \' + __import__(\'os\').path.join(\'$(var ros_home)\', p) for p in \'$(var rosbag_path)\'.split())')"
+              shell="true" output="screen"
+              unless="$(eval '\'$(var rosbag_path)\' == \'\'')"/>
+
+  <!-- Run the wavemap server -->
+  <group>
+    <let if="$(var debug_mode)" name="launch_prefix"
+         value="gdb -ex run --args"/>
+    <let unless="$(var debug_mode)" name="launch_prefix" value=""/>
+
+    <node name="wavemap" pkg="wavemap_ros_ros2"
+          exec="ros_server"
+          output="screen"
+          launch-prefix="$(var launch_prefix)">
+      <param name="general.config_file" value="$(var param_file)"/>
+      <param name="use_sim_time" value="$(var use_sim_time)"/>
+    </node>
+  </group>
+
+  <!-- Show Rviz -->
+  <group if="$(var show_rviz)">
+    <node pkg="rviz2" exec="rviz2" name="$(anon rviz)" output="screen"
+          args="-d $(var rviz_config)">
+      <param name="use_sim_time" value="$(var use_sim_time)"/>
+    </node>
+  </group>
+</launch>

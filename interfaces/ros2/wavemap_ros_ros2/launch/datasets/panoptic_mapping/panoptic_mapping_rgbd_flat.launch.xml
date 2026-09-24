@@ -1,0 +1,52 @@
+<launch>
+  <!-- Wavemap params -->
+  <arg name="param_file"
+       default="$(find-pkg-share wavemap_ros_ros2)/config/wavemap_panoptic_mapping_rgbd.yaml"
+       description="Name of the file from which to read wavemap's server params."/>
+
+  <!-- Dataset params -->
+  <arg name="use_batch_mode" default="false"
+       description="Whether to replay the experiment using panoptic mapping's data player, or process it in batch mode.
+            If you would like to use batch_mode, please replay the data once, record it into a rosbag
+            and update the rosbag_path at the bottom of this launch file."/>
+  <!-- NOTE: Relative paths will be resolved w.r.t. ROS_HOME (default ~/.ros) -->
+  <arg name="base_path"
+       default="../data/panoptic_mapping/flat_dataset/run1"/>
+  <arg name="play_rate" default="1.0"/>
+  <arg name="wait" default="false"/>
+  <arg name="namespace" default="data"/>
+  <arg name="max_frames" default="1000000000"/>
+  <arg name="global_frame_name" default="odom"/>
+  <arg name="sensor_frame_name" default="depth_camera"/>
+
+  <group unless="$(var use_batch_mode)">
+    <!-- Play the data -->
+    <node pkg="wavemap_ros_ros2" exec="panoptic_mapping_flat_data_player.py"
+          name="flat_data_player" output="screen"
+          cwd="$(env ROS_HOME $(env HOME)/.ros)">
+      <param name="data_path" value="$(var base_path)"/>
+      <param name="play_rate" value="$(var play_rate)"/>
+      <param name="global_frame_name" value="$(var global_frame_name)"/>
+      <param name="sensor_frame_name" value="$(var sensor_frame_name)"/>
+      <param name="wait" value="$(var wait)"/>
+      <param name="max_frames" value="$(var max_frames)"/>
+
+      <remap from="~/color_image" to="$(var namespace)/color_image"/>
+      <remap from="~/depth_image" to="$(var namespace)/depth_image"/>
+      <remap from="~/color_image/camera_info" to="$(var namespace)/color_image/camera_info"/>
+      <remap from="~/depth_image/camera_info" to="$(var namespace)/depth_image/camera_info"/>
+      <remap from="~/id_image" to="$(var namespace)/segmentation_image"/>
+      <remap from="~/labels" to="$(var namespace)/segmentation_labels"/>
+      <remap from="~/pose" to="$(var namespace)/pose"/>
+    </node>
+    <!-- Run wavemap -->
+    <include file="$(find-pkg-share wavemap_ros_ros2)/launch/wavemap_server.launch.xml"/>
+  </group>
+  <group if="$(var use_batch_mode)">
+    <!-- Directly ingest the preprocessed rosbag -->
+    <let name="rosbag_path"
+         value="$(var base_path)/run1.bag"/>
+    <!-- Run wavemap -->
+    <include file="$(find-pkg-share wavemap_ros_ros2)/launch/datasets/dataset_base.launch.xml"/>
+  </group>
+</launch>

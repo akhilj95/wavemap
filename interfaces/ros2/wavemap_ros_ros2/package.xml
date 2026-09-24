@@ -32,6 +32,16 @@
   <depend>geometry_msgs</depend>
   <depend>visualization_msgs</depend>
 
+  <!-- Launch files: bag replay and the Panoptic Mapping data player. -->
+  <exec_depend>launch_xml</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <exec_depend>ros2bag</exec_depend>
+  <exec_depend>tf2_ros_py</exec_depend>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>python3-numpy</exec_depend>
+  <exec_depend>python3-opencv</exec_depend>
+  <exec_depend>python3-pil</exec_depend>
+
   <test_depend>ament_cmake_gtest</test_depend>
 
   <export>

@@ -1,3 +1,5 @@
+#include "wavemap_ros_ros2/utils/rosbag_processor.h"
+
 #include <memory>
 #include <sstream>
 #include <string>
@@ -10,7 +12,6 @@
 #include "wavemap_ros_ros2/inputs/depth_image_topic_input.h"
 #include "wavemap_ros_ros2/inputs/pointcloud_topic_input.h"
 #include "wavemap_ros_ros2/ros_server.h"
-#include "wavemap_ros_ros2/utils/rosbag_processor.h"
 
 using namespace wavemap;  // NOLINT
 int main(int argc, char** argv) {
@@ -50,6 +51,14 @@ int main(int argc, char** argv) {
   const std::string rosbag_paths_str =
       node->declare_parameter<std::string>("rosbag_path", "");
   const bool keep_alive = node->declare_parameter<bool>("keep_alive", false);
+  // NOTE: ROS1 relied on rosbag_processor.launch's required rosbag_path arg
+  //       for this. The ROS2 launch file cannot make it required (included
+  //       launch files only count explicitly passed required args).
+  if (rosbag_paths_str.find_first_not_of(" \t\n") == std::string::npos) {
+    LOG(ERROR) << "ROS parameter \"rosbag_path\" is not set. It must list "
+                  "the rosbag(s) to process, separated by spaces.";
+    return -1;
+  }
 
   // Create the rosbag processor and load the rosbags
   RosbagProcessor rosbag_processor{*node};

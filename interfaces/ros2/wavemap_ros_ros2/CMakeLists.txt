@@ -101,6 +101,8 @@ install(DIRECTORY include/${PROJECT_NAME}
     DESTINATION include/${PROJECT_NAME})
 install(DIRECTORY launch config
     DESTINATION share/${PROJECT_NAME})
+install(PROGRAMS scripts/panoptic_mapping_flat_data_player.py
+    DESTINATION lib/${PROJECT_NAME})
 
 ament_export_targets(${PROJECT_NAME}-targets HAS_LIBRARY_TARGET)
 ament_export_include_directories(include/${PROJECT_NAME})
