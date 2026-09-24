@@ -132,7 +132,15 @@ repos:
         language: system
         types: [ file ]
         files: (package.xml)$
+        exclude: ^interfaces/ros2/
         args: [ --schema, tooling/schemas/xml/package_format2.xsd ]
+      - name: Check ROS2 package manifest schema conformance
+        id: xmllint
+        entry: xmllint --noout
+        language: system
+        types: [ file ]
+        files: ^interfaces/ros2/.*(package.xml)$
+        args: [ --schema, tooling/schemas/xml/package_format3.xsd ]
       - name: Check ROS launch file schema conformance
         id: xmllint
         entry: xmllint --noout
