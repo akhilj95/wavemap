@@ -6,6 +6,7 @@
 
 #include <glog/logging.h>
 
+#include "wavemap_ros_ros2/inputs/depth_image_topic_input.h"
 #include "wavemap_ros_ros2/inputs/pointcloud_topic_input.h"
 
 namespace wavemap {
@@ -45,12 +46,15 @@ std::unique_ptr<RosInputBase> RosInputFactory::create(
         return nullptr;
       }
     case RosInputType::kDepthImageTopic:
-      // Not yet ported. Scheduled for phase 4 (see claude/phases.md), together
-      // with its cv_bridge/image_transport dependencies. Reported rather than
-      // silently ignored so a config that asks for it fails loudly.
-      LOG(ERROR) << "Input type \"" << input_type.toStr()
-                 << "\" is not yet available in the ROS2 interface.";
-      return nullptr;
+      if (const auto config = DepthImageTopicInputConfig::from(params);
+          config) {
+        return std::make_unique<DepthImageTopicInput>(
+            config.value(), std::move(pipeline), std::move(transformer),
+            std::move(world_frame), node);
+      } else {
+        LOG(ERROR) << "Depth image input handler config could not be loaded.";
+        return nullptr;
+      }
   }
 
   LOG(ERROR) << "Factory does not support creation of input type "

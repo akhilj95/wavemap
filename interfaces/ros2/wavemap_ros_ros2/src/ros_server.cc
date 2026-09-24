@@ -205,12 +205,6 @@ MapOperationBase* RosServer::addOperation(const param::Value& operation_params,
     auto operation = MapRosOperationFactory::create(
         type, operation_params, occupancy_map_, thread_pool_, transformer_,
         config_.world_frame, node);
-    // NOTE: The factory returns nullptr for ROS operations that are not yet
-    //       ported. Pipeline::addOperation would dereference it, so those are
-    //       dropped here instead. The factory has already said which and why.
-    if (!operation) {
-      return nullptr;
-    }
     return pipeline_->addOperation(std::move(operation));
   }
 

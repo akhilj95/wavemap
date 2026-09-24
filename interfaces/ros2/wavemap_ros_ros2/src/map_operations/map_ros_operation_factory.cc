@@ -6,6 +6,8 @@
 
 #include <glog/logging.h>
 
+#include "wavemap_ros_ros2/map_operations/crop_map_operation.h"
+#include "wavemap_ros_ros2/map_operations/publish_map_operation.h"
 #include "wavemap_ros_ros2/map_operations/publish_pointcloud_operation.h"
 
 namespace wavemap {
@@ -29,10 +31,6 @@ std::unique_ptr<MapOperationBase> MapRosOperationFactory::create(
     MapBase::Ptr occupancy_map, std::shared_ptr<ThreadPool> thread_pool,
     std::shared_ptr<TfTransformer> transformer, std::string world_frame,
     rclcpp::Node& node) {
-  // Unused until phase 4 restores the two operations that need them:
-  // publish_map takes the thread pool, crop_map takes the transformer.
-  (void)thread_pool;
-  (void)transformer;
   if (!ros_operation_type.isValid()) {
     LOG(ERROR) << "Received request to create map operation with invalid type.";
     return nullptr;
@@ -40,6 +38,15 @@ std::unique_ptr<MapOperationBase> MapRosOperationFactory::create(
 
   // Create the operation handler
   switch (ros_operation_type) {
+    case MapRosOperationType::kPublishMap:
+      if (const auto config = PublishMapOperationConfig::from(params); config) {
+        return std::make_unique<PublishMapOperation>(
+            config.value(), std::move(occupancy_map), std::move(thread_pool),
+            std::move(world_frame), node);
+      } else {
+        LOG(ERROR) << "Publish map operation config could not be loaded.";
+        return nullptr;
+      }
     case MapRosOperationType::kPublishPointcloud:
       if (const auto config = PublishPointcloudOperationConfig::from(params);
           config) {
@@ -51,21 +58,15 @@ std::unique_ptr<MapOperationBase> MapRosOperationFactory::create(
                       "loaded.";
         return nullptr;
       }
-    case MapRosOperationType::kPublishMap:
     case MapRosOperationType::kCropMap:
-      // Not yet ported. Scheduled for phase 4 (see claude/phases.md).
-      //
-      // Returning nullptr here is non-fatal by design: RosServer::addOperation
-      // simply does not add the stage, and the rest of the pipeline runs. That
-      // matters because all eight shipped ROS1 configs list publish_map, so
-      // refusing to start on it would mean no stock config could be used
-      // unmodified. Map contents are unaffected -- publishing and cropping are
-      // both downstream of integration.
-      LOG(WARNING) << "Map operation type \"" << ros_operation_type.toStr()
-                   << "\" is not yet available in the ROS2 interface. "
-                      "Skipping this operation; the rest of the pipeline is "
-                      "unaffected.";
-      return nullptr;
+      if (const auto config = CropMapOperationConfig::from(params); config) {
+        return std::make_unique<CropMapOperation>(
+            config.value(), std::move(occupancy_map), std::move(transformer),
+            std::move(world_frame), node);
+      } else {
+        LOG(ERROR) << "Crop map operation config could not be loaded.";
+        return nullptr;
+      }
   }
 
   LOG(ERROR) << "Factory does not (yet) support creation of map operation type "

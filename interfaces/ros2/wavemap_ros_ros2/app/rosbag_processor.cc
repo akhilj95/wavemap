@@ -7,6 +7,7 @@
 #include <rosgraph_msgs/msg/clock.hpp>
 #include <wavemap/core/utils/profile/resource_monitor.h>
 
+#include "wavemap_ros_ros2/inputs/depth_image_topic_input.h"
 #include "wavemap_ros_ros2/inputs/pointcloud_topic_input.h"
 #include "wavemap_ros_ros2/ros_server.h"
 #include "wavemap_ros_ros2/utils/rosbag_processor.h"
@@ -68,6 +69,12 @@ int main(int argc, char** argv) {
             rosbag_processor.addCallback(input->getTopicName(), callback_ptr,
                                          pointcloud_input);
           });
+    } else if (auto depth_image_input =
+                   dynamic_cast<DepthImageTopicInput*>(input.get());
+               depth_image_input) {
+      rosbag_processor.addCallback<sensor_msgs::msg::Image>(
+          input->getTopicName(), &DepthImageTopicInput::callback,
+          depth_image_input);
     } else {
       LOG(WARNING) << "Failed to register callback for input number "
                    << input_idx << ", with topic \"" << input->getTopicName()

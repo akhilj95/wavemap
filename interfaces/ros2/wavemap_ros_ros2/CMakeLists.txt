@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.10)
 project(wavemap_ros_ros2)
 
 # Find dependencies
+# NOTE: OpenCV is normally included through cv_bridge, but we still explicitly
+#       include it to avoid issues on Jetson. Mirrors the ROS1 package.
+find_package(OpenCV REQUIRED)
 find_package(ament_cmake REQUIRED)
 find_package(wavemap_ros2 REQUIRED)
 find_package(wavemap_msgs_ros2 REQUIRED)
@@ -10,6 +13,7 @@ find_package(rclcpp REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_msgs REQUIRED)
 find_package(image_transport REQUIRED)
+find_package(cv_bridge REQUIRED)
 find_package(rosbag2_cpp REQUIRED)
 find_package(rosbag2_storage REQUIRED)
 find_package(rosgraph_msgs REQUIRED)
@@ -31,10 +35,13 @@ endif ()
 # defaults to STATIC, and a static library propagates even its PRIVATE
 # dependencies into consumers' link lines.
 add_library(${PROJECT_NAME} SHARED
+    src/inputs/depth_image_topic_input.cc
     src/inputs/pointcloud_topic_input.cc
     src/inputs/ros_input_base.cc
     src/inputs/ros_input_factory.cc
+    src/map_operations/crop_map_operation.cc
     src/map_operations/map_ros_operation_factory.cc
+    src/map_operations/publish_map_operation.cc
     src/map_operations/publish_pointcloud_operation.cc
     src/utils/pointcloud_msg_builder.cc
     src/utils/pointcloud_undistorter.cc
@@ -59,6 +66,8 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     tf2_ros::tf2_ros
     ${tf2_msgs_TARGETS}
     image_transport::image_transport
+    cv_bridge::cv_bridge
+    ${OpenCV_LIBS}
     rosbag2_cpp::rosbag2_cpp
     rosbag2_storage::rosbag2_storage
     ${rosgraph_msgs_TARGETS}
@@ -97,7 +106,7 @@ ament_export_targets(${PROJECT_NAME}-targets HAS_LIBRARY_TARGET)
 ament_export_include_directories(include/${PROJECT_NAME})
 ament_export_dependencies(
     wavemap_ros2 wavemap_msgs_ros2 wavemap_ros_conversions_ros2
-    rclcpp tf2_ros tf2_msgs image_transport
+    rclcpp tf2_ros tf2_msgs image_transport cv_bridge OpenCV
     rosbag2_cpp rosbag2_storage rosgraph_msgs
     std_srvs sensor_msgs geometry_msgs visualization_msgs)
 
