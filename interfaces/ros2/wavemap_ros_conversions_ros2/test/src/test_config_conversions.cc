@@ -104,21 +104,22 @@ TEST(ConfigConversions, NestedSequencesOfMapsSurvive) {
 }
 
 TEST(ConfigConversions, MissingFileIsReportedNotSilentlyEmpty) {
-  EXPECT_FALSE(
-      param::convert::yamlFileToParams("/nonexistent/wavemap.yaml").has_value());
+  EXPECT_FALSE(param::convert::yamlFileToParams("/nonexistent/wavemap.yaml")
+                   .has_value());
 }
 
 TEST(ConfigConversions, MalformedYamlIsReportedNotSilentlyEmpty) {
-  EXPECT_FALSE(param::convert::yamlStringToParams("key: [unclosed").has_value());
+  EXPECT_FALSE(
+      param::convert::yamlStringToParams("key: [unclosed").has_value());
 }
 
 // Every config shipped for ROS1 must parse unchanged, since user-facing
 // parity is the whole point: a ROS1 user points general.config_file at the
-// same file they already have.
+// same file they already have. test/config holds copies of those configs.
 TEST(ConfigConversions, AllShippedRos1ConfigsParse) {
-  const std::filesystem::path config_dir{kRos1ConfigDir};
+  const std::filesystem::path config_dir{kTestConfigDir};
   ASSERT_TRUE(std::filesystem::is_directory(config_dir))
-      << "ROS1 config dir not found at " << config_dir;
+      << "Test config dir not found at " << config_dir;
 
   int configs_checked = 0;
   for (const auto& entry : std::filesystem::directory_iterator(config_dir)) {

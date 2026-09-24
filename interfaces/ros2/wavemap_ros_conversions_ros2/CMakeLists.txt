@@ -45,15 +45,16 @@ target_include_directories(${PROJECT_NAME} PRIVATE src)
 if (BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
 
-  # The ROS1 configs double as test data: parity means a ROS1 user's existing
-  # file must parse unchanged. Resolved through symlinks, since the
-  # documented workspace layout symlinks interfaces/ros2 into src/.
-  # Resolve our own path through the symlink BEFORE walking up, otherwise
-  # ../.. lands in the workspace's src/ rather than in the repo.
+  # Copies of the configs shipped for ROS1 double as test data: parity means
+  # a ROS1 user's existing file must parse unchanged.
+  set(TEST_CONFIG_DIR "${CMAKE_CURRENT_SOURCE_DIR}/test/config")
+
+  # The library is resolved through symlinks, since the documented workspace
+  # layout symlinks interfaces/ros2 into src/. Resolve our own path through
+  # the symlink BEFORE walking up, otherwise ../.. lands in the workspace's
+  # src/ rather than in the repo.
   get_filename_component(THIS_PACKAGE_DIR "${CMAKE_CURRENT_SOURCE_DIR}"
       REALPATH)
-  get_filename_component(ROS1_CONFIG_DIR
-      "${THIS_PACKAGE_DIR}/../../ros1/wavemap_ros/config" REALPATH)
   get_filename_component(WAVEMAP_LIBRARY_TEST_INCLUDE_DIR
       "${THIS_PACKAGE_DIR}/../../../library/cpp/test/include" REALPATH)
 
@@ -61,7 +62,7 @@ if (BUILD_TESTING)
       test/src/test_config_conversions.cc)
   set_wavemap_target_properties(test_${PROJECT_NAME})
   target_compile_definitions(test_${PROJECT_NAME} PRIVATE
-      kRos1ConfigDir="${ROS1_CONFIG_DIR}")
+      kTestConfigDir="${TEST_CONFIG_DIR}")
   target_link_libraries(test_${PROJECT_NAME} ${PROJECT_NAME})
 
   # Typed round-trip test (map -> msg -> map) over all 4 map types, ported
