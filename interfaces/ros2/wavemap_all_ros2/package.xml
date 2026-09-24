@@ -15,6 +15,7 @@
   <exec_depend>wavemap_ros2</exec_depend>
   <exec_depend>wavemap_msgs_ros2</exec_depend>
   <exec_depend>wavemap_ros_conversions_ros2</exec_depend>
+  <exec_depend>wavemap_ros_ros2</exec_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
