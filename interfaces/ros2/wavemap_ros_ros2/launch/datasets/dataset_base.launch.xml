@@ -6,9 +6,8 @@
   <arg name="debug_mode"
        default="false"
        description="Run the mapper in a debugger (gdb)."/>
-  <!-- NOTE: Off by default until the wavemap RViz2 plugin is ported. -->
   <arg name="show_rviz"
-       default="false"
+       default="true"
        description="Automatically launch Rviz."/>
   <arg name="record_rosbag" default="false"/>
   <!-- Relative paths will be resolved w.r.t. ROS_HOME (default ~/.ros) -->

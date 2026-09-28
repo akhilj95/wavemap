@@ -43,7 +43,7 @@ std::string typeOf(const std::string& scalar) {
 // ROS1 user's existing config behave identically here.
 //
 // Every expectation below was verified against PyYAML directly rather than
-// assumed: see claude/progress.md.
+// assumed.
 TEST(ConfigConversions, Yaml11BooleansMatchPyYaml) {
   EXPECT_EQ(typeOf("yes"), "bool:true");
   EXPECT_EQ(typeOf("no"), "bool:false");

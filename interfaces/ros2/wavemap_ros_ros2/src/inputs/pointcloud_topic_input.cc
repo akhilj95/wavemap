@@ -5,8 +5,8 @@
 #include <utility>
 #include <vector>
 
-#include <glog/logging.h>
 #include <geometry_msgs/msg/point32.hpp>
+#include <glog/logging.h>
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <sensor_msgs/point_cloud2_iterator.hpp>
 #include <wavemap/core/utils/profile/profiler_interface.h>
@@ -59,12 +59,12 @@ PointcloudTopicInput::PointcloudTopicInput(
   // Subscribe to the pointcloud input.
   // NOTE: SensorDataQoS (best effort) rather than the default Reliable. Most
   //       ROS2 sensor drivers publish best effort, and a Reliable subscriber
-  //       silently never connects to one -- see claude/issues.md. The history
-  //       depth comes from topic_queue_length, the same config field ROS1
-  //       used as its subscriber queue length.
+  //       silently never connects to one. The history depth comes from
+  //       topic_queue_length, the same config field ROS1 used as its
+  //       subscriber queue length.
   registerCallback(config_.topic_type, [this, &node](auto callback_ptr) {
-    using MessageT = decltype(detail::pointcloudCallbackMessageType(
-        callback_ptr));
+    using MessageT =
+        decltype(detail::pointcloudCallbackMessageType(callback_ptr));
     pointcloud_sub_ = node.create_subscription<MessageT>(
         config_.topic_name,
         rclcpp::SensorDataQoS().keep_last(config_.topic_queue_length),
@@ -92,19 +92,19 @@ void PointcloudTopicInput::callback(
   // Skip empty clouds
   const size_t num_points = pointcloud_msg.height * pointcloud_msg.width;
   if (num_points == 0) {
-    LOG(WARNING) << "Skipping empty pointcloud with timestamp "
-                 << rclcpp::Time(pointcloud_msg.header.stamp, RCL_ROS_TIME)
-                        .nanoseconds()
-                 << ".";
+    LOG(WARNING)
+        << "Skipping empty pointcloud with timestamp "
+        << rclcpp::Time(pointcloud_msg.header.stamp, RCL_ROS_TIME).nanoseconds()
+        << ".";
     return;
   }
 
   // Get the index of the x field, and assert that the y and z fields follow
-  auto x_field_iter = std::find_if(
-      pointcloud_msg.fields.cbegin(), pointcloud_msg.fields.cend(),
-      [](const sensor_msgs::msg::PointField& field) {
-        return field.name == "x";
-      });
+  auto x_field_iter =
+      std::find_if(pointcloud_msg.fields.cbegin(), pointcloud_msg.fields.cend(),
+                   [](const sensor_msgs::msg::PointField& field) {
+                     return field.name == "x";
+                   });
   if (x_field_iter == pointcloud_msg.fields.end()) {
     LOG(WARNING) << "Received pointcloud with missing field x";
     return;
@@ -177,10 +177,10 @@ void PointcloudTopicInput::callback(
   ProfilerZoneScoped;
   // Skip empty clouds
   if (pointcloud_msg.points.empty()) {
-    LOG(WARNING) << "Skipping empty pointcloud with timestamp "
-                 << rclcpp::Time(pointcloud_msg.header.stamp, RCL_ROS_TIME)
-                        .nanoseconds()
-                 << ".";
+    LOG(WARNING)
+        << "Skipping empty pointcloud with timestamp "
+        << rclcpp::Time(pointcloud_msg.header.stamp, RCL_ROS_TIME).nanoseconds()
+        << ".";
     return;
   }
 

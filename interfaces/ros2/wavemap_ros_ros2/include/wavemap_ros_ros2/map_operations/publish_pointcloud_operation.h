@@ -55,7 +55,7 @@ class PublishPointcloudOperation : public MapOperationBase {
   //       default rclcpp::Time is RCL_SYSTEM_TIME, and ROS2 throws on
   //       subtracting times of differing clock types -- so `current_time -
   //       last_run_timestamp_` in shouldRun() would throw on the very first
-  //       call. See claude/issues.md.
+  //       call.
   rclcpp::Time last_run_timestamp_;
 
   // Pointcloud publishing

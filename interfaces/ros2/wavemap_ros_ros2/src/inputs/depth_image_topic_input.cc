@@ -52,7 +52,7 @@ DepthImageTopicInput::DepthImageTopicInput(
   // NOTE: SensorDataQoS (best effort), as for the pointcloud input: a best
   //       effort subscriber connects to both best effort and reliable
   //       publishers, whereas a reliable one silently never connects to a best
-  //       effort publisher. See claude/issues.md.
+  //       effort publisher.
   depth_image_sub_ = image_transport::create_subscription(
       &node, config_.topic_name,
       [this](const sensor_msgs::msg::Image::ConstSharedPtr& msg) {
@@ -91,8 +91,7 @@ void DepthImageTopicInput::processQueue() {
     if (!T_W_C) {
       const rclcpp::Time newest_stamp(depth_image_queue_.back().header.stamp,
                                       RCL_ROS_TIME);
-      if ((newest_stamp - oldest_stamp).seconds() <
-          config_.max_wait_for_pose) {
+      if ((newest_stamp - oldest_stamp).seconds() < config_.max_wait_for_pose) {
         // Try to get this depth image's pose again at the next iteration
         return;
       } else {

@@ -1,6 +1,9 @@
 # RViz2 port of interfaces/ros1/wavemap_ros/config/rviz/default.rviz.
-# NOTE: The "Occupancy grid" group (wavemap_rviz_plugin/WavemapMap) is left
-#       out until the plugin is ported to RViz2. Everything else matches ROS1.
+# NOTE: ROS1's disabled Image and RobotModel displays and its SetInitialPose,
+#       SetGoal and PublishPoint tools are not carried over.
+# NOTE: ROS1's map display set "Show grid"/"Show slice" options that its
+#       plugin no longer has, so RViz1 ignored them and used the defaults.
+#       They are left out here, which gives the same result.
 Panels:
   - Class: rviz_common/Displays
     Help Height: 0
@@ -137,6 +140,56 @@ Visualization Manager:
           Value: true
       Enabled: false
       Name: Input
+    - Class: rviz_common/Group
+      Displays:
+        - Class: wavemap_rviz_plugin_ros2/WavemapMap
+          Enabled: true
+          Name: Map
+          Topic:
+            Depth: 10
+            Durability Policy: Volatile
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /wavemap/map
+          Value: true
+        - Class: rviz_default_plugins/MarkerArray
+          Enabled: false
+          Name: Estimate
+          Namespaces:
+            {}
+          Topic:
+            Depth: 100
+            Durability Policy: Volatile
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /wavemap/occupancy_grid
+          Value: false
+        - Class: rviz_default_plugins/MarkerArray
+          Enabled: false
+          Name: Ground truth
+          Namespaces:
+            {}
+          Topic:
+            Depth: 100
+            Durability Policy: Volatile
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /wavemap/occupancy_grid_ground_truth
+          Value: false
+        - Class: rviz_default_plugins/MarkerArray
+          Enabled: false
+          Name: Error
+          Namespaces:
+            {}
+          Topic:
+            Depth: 100
+            Durability Policy: Volatile
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /wavemap/occupancy_grid_error
+          Value: false
+      Enabled: true
+      Name: Occupancy grid
   Enabled: true
   Global Options:
     Background Color: 243; 243; 243

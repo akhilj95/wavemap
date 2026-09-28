@@ -54,8 +54,7 @@ class RosServer {
   // ROS2's parameter system cannot represent a list of heterogeneous dicts,
   // which `map_operations:` and `inputs:` both are, so the file is read
   // directly instead of being pushed through the parameter server. The YAML
-  // schema is unchanged: a ROS1 user's config file works as-is. See
-  // claude/decisions.md section 2.
+  // schema is unchanged: a ROS1 user's config file works as-is.
   static constexpr const char* kConfigFileParamName = "general.config_file";
 
   // Reads kConfigFileParamName and loads the config file it points at.

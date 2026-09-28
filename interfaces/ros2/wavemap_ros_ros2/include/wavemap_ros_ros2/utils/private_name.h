@@ -9,8 +9,7 @@ namespace wavemap {
 // ROS1 advertised these through nh_private, whose namespace is the node name,
 // so `advertise("map")` became /wavemap/map. ROS2 resolves a relative name
 // against the node's *namespace* instead, which would yield /map, so the
-// tilde has to be explicit. See the "Topic/service namespacing" entry in
-// claude/issues.md.
+// tilde has to be explicit.
 //
 // Names the user wrote as absolute (leading '/') are passed through
 // untouched, matching ROS1: nh_private.advertise("/foo") also resolved

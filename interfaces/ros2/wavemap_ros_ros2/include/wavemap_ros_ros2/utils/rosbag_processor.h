@@ -7,6 +7,7 @@
 #include <optional>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <glog/logging.h>
@@ -22,8 +23,8 @@ namespace wavemap {
 // rosbag_processor.h, on top of rosbag2_cpp::Reader.
 //
 // Two deliberate departures from the ROS1 version, both in service of
-// determinism, which is what makes this the parity oracle for test level T2
-// (see claude/phases.md):
+// determinism, which is what makes it usable as the reference for checking
+// that ROS2 builds the same map as ROS1:
 //
 //  1. TF is fed straight into the transformer's buffer via addTfInjector(),
 //     rather than being republished onto /tf for the node's own
@@ -68,8 +69,7 @@ class RosbagProcessor {
 
   void addRepublisher(const std::string& rosbag_topic_name,
                       const std::string& republished_topic_name,
-                      const std::string& message_type,
-                      unsigned int queue_size);
+                      const std::string& message_type, unsigned int queue_size);
 
   void enableSimulatedClock() {
     simulated_clock_pub_ =
@@ -90,8 +90,7 @@ class RosbagProcessor {
   std::map<std::string, std::shared_ptr<rclcpp::GenericPublisher>>
       republishers_;
   std::vector<std::function<void()>> queue_flushers_;
-  rclcpp::Publisher<rosgraph_msgs::msg::Clock>::SharedPtr
-      simulated_clock_pub_;
+  rclcpp::Publisher<rosgraph_msgs::msg::Clock>::SharedPtr simulated_clock_pub_;
 
   // Pop the chronologically next message across all opened bags, or nullptr
   // when they are all exhausted.

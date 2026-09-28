@@ -9,9 +9,10 @@ They mirror the ROS1 packages: the same server and rosbag processor, the same to
 
 .. note::
 
-    The ROS2 interface does not yet include the Rviz plugin used to visualize wavemap's maps, or the launch files for the online sensor setups and the Newer College dataset.
-    The launch files' ``show_rviz`` argument therefore defaults to ``false``.
-    It still works if Rviz2 is installed (``sudo apt install ros-jazzy-rviz2``), but can only show the inputs, not the map.
+    The ROS2 interface does not yet include the launch files for the online sensor setups and the Newer College dataset.
+
+As in ROS1, the launch files start Rviz2 with wavemap's map display by default.
+On machines without a display, such as a server or a Docker container without X forwarding, pass ``show_rviz:=false``.
 
 .. _installation-ros2-docker:
 
@@ -99,7 +100,7 @@ To process one or more rosbags as fast as possible, use::
     ros2 launch wavemap_ros_ros2 rosbag_processor.launch.xml param_file:=/path/to/your_config.yaml rosbag_path:="/path/to/first_bag /path/to/second_bag"
 
 As in ROS1, relative rosbag paths are resolved with respect to ``ROS_HOME`` (default ``~/.ros``).
-The rosbag processor exits once it is done, unless ``show_rviz:=true`` is set.
+As in ROS1, the rosbag processor stays alive once it is done, so the map can be inspected in Rviz2, unless ``show_rviz:=false`` is set, in which case it exits.
 While wavemap is running, its map can be saved with::
 
     ros2 service call /wavemap/save_map wavemap_msgs_ros2/srv/FilePath "{file_path: /path/to/map.wvmp}"

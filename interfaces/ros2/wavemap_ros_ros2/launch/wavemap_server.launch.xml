@@ -10,9 +10,8 @@
   <arg name="debug_mode"
        default="false"
        description="Run the mapper in a debugger (gdb)."/>
-  <!-- NOTE: Off by default until the wavemap RViz2 plugin is ported. -->
   <arg name="show_rviz"
-       default="false"
+       default="true"
        description="Automatically launch Rviz."/>
   <arg name="rviz_config"
        default="$(find-pkg-share wavemap_ros_ros2)/config/rviz/default.rviz"/>

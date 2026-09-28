@@ -7,7 +7,7 @@ project(wavemap_ros2 VERSION 2.2.1 LANGUAGES CXX)
 #       CMAKE_BUILD_TYPE: no -O3, and no NDEBUG, which leaves the library's
 #       DCHECKs live in its hottest loops. The ROS1 side avoids this through
 #       `catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release`, set once per
-#       workspace. See claude/phases.md.
+#       workspace.
 if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   message(STATUS "No build type specified, defaulting to Release.")
   set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)

@@ -1,9 +1,9 @@
+#include "wavemap_ros_ros2/ros_server.h"
+
 #include <memory>
 
 #include <glog/logging.h>
 #include <rclcpp/rclcpp.hpp>
-
-#include "wavemap_ros_ros2/ros_server.h"
 
 int main(int argc, char** argv) {
   rclcpp::init(argc, argv);
@@ -19,8 +19,7 @@ int main(int argc, char** argv) {
   // NOTE: Single-threaded, and not incidentally. PointcloudTopicInput's
   //       pointcloud_queue_ has no mutex, because ROS1's single-threaded
   //       spinner serialized every callback. A MultiThreadedExecutor here
-  //       would race the subscription callback against the retry timer. See
-  //       claude/issues.md.
+  //       would race the subscription callback against the retry timer.
   rclcpp::executors::SingleThreadedExecutor executor;
   executor.add_node(node);
   executor.spin();

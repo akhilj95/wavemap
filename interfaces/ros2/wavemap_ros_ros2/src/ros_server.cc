@@ -82,7 +82,7 @@ param::Value RosServer::loadParams(rclcpp::Node& node) {
           : node.declare_parameter<std::string>(kConfigFileParamName, "");
   if (config_file.empty()) {
     const std::string message =
-        std::string{"ROS parameter \""} + kConfigFileParamName +
+        std::string("ROS parameter \"") + kConfigFileParamName +
         "\" is not set. It must point at wavemap's YAML config file.";
     LOG(ERROR) << message;
     throw std::runtime_error(message);
@@ -245,7 +245,7 @@ void RosServer::advertiseServices(rclcpp::Node& node) {
   //       nh_private, whose namespace is the node name; ROS2 resolves a
   //       relative name against the node's namespace instead. Without the
   //       tilde these would land at /reset_map rather than
-  //       /wavemap/reset_map. See claude/issues.md.
+  //       /wavemap/reset_map.
   reset_map_srv_ = node.create_service<Trigger>(
       privateName("reset_map"),
       [this](const std::shared_ptr<Trigger::Request> /*request*/,
