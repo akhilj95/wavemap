@@ -34,9 +34,12 @@
   <let name="ros_home" value="$(env ROS_HOME $(env HOME)/.ros)"/>
 
   <!-- Play the rosbag if a path was specified -->
-  <!-- NOTE: shell="true" so that each bag becomes its own -i argument. -->
+  <!-- NOTE: shell="true" so that each bag becomes its own -i argument. The
+             exec makes the shell replace itself with the player, so that
+             launch's shutdown signals reach the player. Otherwise only the
+             shell is killed and the player keeps publishing /clock. -->
   <executable name="player"
-              cmd="ros2 bag play --rate 1.0 --start-offset $(var rosbag_skip_first_n_sec) --clock 100 --disable-keyboard-controls $(eval '\' \'.join(\'-i \' + __import__(\'os\').path.join(\'$(var ros_home)\', p) for p in \'$(var rosbag_path)\'.split())')"
+              cmd="exec ros2 bag play --rate 1.0 --start-offset $(var rosbag_skip_first_n_sec) --clock 100 --disable-keyboard-controls $(eval '\' \'.join(\'-i \' + __import__(\'os\').path.join(\'$(var ros_home)\', p) for p in \'$(var rosbag_path)\'.split())')"
               shell="true" output="screen"
               unless="$(eval '\'$(var rosbag_path)\' == \'\'')"/>
 
@@ -52,6 +55,12 @@
           launch-prefix="$(var launch_prefix)">
       <param name="general.config_file" value="$(var param_file)"/>
       <param name="use_sim_time" value="$(var use_sim_time)"/>
+      <!-- NOTE: Fast DDS delivers same-host traffic through shared memory by
+                 default, which silently loses most large best-effort inputs
+                 (e.g. ~6MB Ouster clouds) whenever the node is busy
+                 integrating. Receiving over UDP only avoids this. Only this
+                 node is affected; other RMWs ignore the variable. -->
+      <env name="FASTDDS_BUILTIN_TRANSPORTS" value="UDPv4"/>
     </node>
   </group>
 

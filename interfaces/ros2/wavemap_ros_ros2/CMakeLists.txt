@@ -1,6 +1,16 @@
 cmake_minimum_required(VERSION 3.10)
 project(wavemap_ros_ros2)
 
+# Default to a Release build.
+# NOTE: Each colcon package configures separately, so this needs repeating in
+#       every package, not only in wavemap_ros2 (see the note there). Without
+#       it a plain `colcon build` compiles this package with no -O3 and no
+#       NDEBUG, which made the rosbag processor 8x slower.
+if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  message(STATUS "No build type specified, defaulting to Release.")
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
+endif ()
+
 # Find dependencies
 # NOTE: OpenCV is normally included through cv_bridge, but we still explicitly
 #       include it to avoid issues on Jetson. Mirrors the ROS1 package.
