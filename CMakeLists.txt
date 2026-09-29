@@ -42,6 +42,19 @@ elseif ("$ENV{ROS_VERSION}" STREQUAL "2")
   # ROS interfaces and tooling
   add_subdirectory(interfaces/ros2/wavemap_ros2)
   add_subdirectory(interfaces/ros2/wavemap_msgs_ros2)
+  add_subdirectory(interfaces/ros2/wavemap_ros_conversions_ros2)
+  add_subdirectory(interfaces/ros2/wavemap_ros_ros2)
+  add_subdirectory(interfaces/ros2/wavemap_rviz_plugin_ros2)
+
+  # Libraries
+  # NOTE: Wavemap's C++ lib is already included through
+  #       interfaces/ros2/wavemap_ros2.
+  add_subdirectory(library/python)
+
+  # Usage examples
+  add_subdirectory(examples/cpp)
+  # NOTE: No examples/ros2 yet -- add_subdirectory(examples/ros2) once it
+  #       exists, mirroring examples/ros1 above.
 
 else ()
   # Load in pure CMake mode
