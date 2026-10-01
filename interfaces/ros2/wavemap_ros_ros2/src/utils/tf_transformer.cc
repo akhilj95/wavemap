@@ -6,8 +6,6 @@
 #include <thread>
 #include <utility>
 
-#include <tf2_ros/buffer_interface.hpp>
-
 #include "wavemap_ros_conversions_ros2/geometry_msg_conversions.h"
 
 namespace wavemap {
@@ -23,14 +21,14 @@ tf2::Duration toTf2Duration(FloatingPoint seconds) {
 
 TfTransformer::TfTransformer(rclcpp::Node& node,
                              FloatingPoint tf_buffer_cache_time)
-    : tf_buffer_(node.get_clock(), toTf2Duration(tf_buffer_cache_time)),
+    : TfTransformer(node, node.get_clock(), tf_buffer_cache_time) {}
+
+TfTransformer::TfTransformer(rclcpp::Node& node,
+                             rclcpp::Clock::SharedPtr buffer_clock,
+                             FloatingPoint tf_buffer_cache_time)
+    : tf_buffer_(std::move(buffer_clock), toTf2Duration(tf_buffer_cache_time)),
       tf_listener_(
           std::make_unique<tf2_ros::TransformListener>(tf_buffer_, &node)) {}
-
-TfTransformer::TfTransformer(rclcpp::Clock::SharedPtr clock,
-                             FloatingPoint tf_buffer_cache_time)
-    : tf_buffer_(std::move(clock), toTf2Duration(tf_buffer_cache_time)),
-      tf_listener_(nullptr) {}
 
 bool TfTransformer::isTransformAvailable(
     const std::string& to_frame_id, const std::string& from_frame_id,
@@ -63,12 +61,6 @@ std::optional<Transformation3D> TfTransformer::lookupTransform(
   return lookupTransformImpl(sanitizeFrameId(to_frame_id),
                              sanitizeFrameId(from_frame_id),
                              tf2_ros::fromRclcpp(frame_timestamp));
-}
-
-bool TfTransformer::setTransform(
-    const geometry_msgs::msg::TransformStamped& transform_msg,
-    const std::string& authority, bool is_static) {
-  return tf_buffer_.setTransform(transform_msg, authority, is_static);
 }
 
 std::string TfTransformer::sanitizeFrameId(const std::string& string) {

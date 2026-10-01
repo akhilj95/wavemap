@@ -6,7 +6,6 @@
 #include <optional>
 #include <string>
 
-#include <geometry_msgs/msg/transform_stamped.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <tf2_ros/buffer.hpp>
 #include <tf2_ros/transform_listener.hpp>
@@ -17,16 +16,20 @@ namespace wavemap {
 // tf_transformer.h.
 class TfTransformer {
  public:
-  // Online: subscribes to /tf and /tf_static through a TransformListener.
+  // Subscribes to /tf and /tf_static through a TransformListener, using the
+  // node's own clock for the buffer.
   explicit TfTransformer(rclcpp::Node& node,
                          FloatingPoint tf_buffer_cache_time = 10.f);
 
-  // Offline: a bare buffer with no listener. Transforms are pushed in
-  // directly via setTransform(), which is how the rosbag processor feeds TF
-  // without a round-trip through the ROS graph. See the note in
-  // rosbag_processor.h for why that round-trip is avoided.
-  explicit TfTransformer(rclcpp::Clock::SharedPtr clock,
-                         FloatingPoint tf_buffer_cache_time = 10.f);
+  // Same TransformListener subscription, but with an explicit buffer clock
+  // instead of the node's own. Used by the rosbag processor: it needs
+  // use_sim_time, but tf2_ros::Buffer clears every *dynamic* transform (its
+  // static cache survives) via Buffer::onTimeJump the moment the node's
+  // clock switches from system to ROS time -- i.e. the instant the first
+  // /clock message lands. A clock that can never switch type sidesteps that
+  // entirely, without giving up the live listener.
+  TfTransformer(rclcpp::Node& node, rclcpp::Clock::SharedPtr buffer_clock,
+                FloatingPoint tf_buffer_cache_time = 10.f);
 
   // Check whether a transform is available
   bool isTransformAvailable(const std::string& to_frame_id,
@@ -46,20 +49,11 @@ class TfTransformer {
   std::optional<Transformation3D> lookupLatestTransform(
       const std::string& to_frame_id, const std::string& from_frame_id);
 
-  // Insert a transform directly into the buffer, bypassing /tf. Used by the
-  // offline rosbag processor; a no-op source of transforms for the live node,
-  // which gets them from its TransformListener instead.
-  bool setTransform(const geometry_msgs::msg::TransformStamped& transform_msg,
-                    const std::string& authority, bool is_static);
-
   // Strip leading slashes if needed to avoid TF errors
   static std::string sanitizeFrameId(const std::string& string);
 
  private:
   tf2_ros::Buffer tf_buffer_;
-  // Null in offline mode. Held by pointer rather than by value because the
-  // listener starts a subscription (and, by default, its own spin thread) on
-  // construction, which the offline processor must not do.
   std::unique_ptr<tf2_ros::TransformListener> tf_listener_;
 
   // Transform lookup timers

@@ -9,7 +9,7 @@ They mirror the ROS1 packages: the same server and rosbag processor, the same to
 
 .. note::
 
-    The ROS2 interface does not yet include the launch files for the online sensor setups and the Newer College dataset.
+    The ROS2 interface does not yet include the launch files for the online sensor setups.
 
 As in ROS1, the launch files start Rviz2 with wavemap's map display by default.
 On machines without a display, such as a server or a Docker container without X forwarding, pass ``show_rviz:=false``.
@@ -108,6 +108,12 @@ While wavemap is running, its map can be saved with::
 To run the Panoptic Mapping flat dataset demo, download and extract the `flat dataset <https://doi.org/10.3929/ethz-c-000788335>`_, and run::
 
     ros2 launch wavemap_ros_ros2 panoptic_mapping_rgbd_flat.launch.xml base_path:=/path/to/flat_dataset/run1
+
+To run one of the Newer College dataset demos (cloister, math, mine or park), convert its sensor and odometry rosbags as described below, and run e.g.::
+
+    ros2 launch wavemap_ros_ros2 newer_college_os0_cloister.launch.xml rosbag_dir:=/path/to/converted/cloister
+
+By default these process the bags in batch mode, using the odometry bag to resolve LiDAR poses. In batch mode, the fixed transforms the sensor rig normally supplies live are instead baked into a short-lived rosbag spanning the input bags' time range, since the batch processor takes TF only from the bags it reads, not from the ROS graph.
 
 Using ROS1 rosbags
 ******************

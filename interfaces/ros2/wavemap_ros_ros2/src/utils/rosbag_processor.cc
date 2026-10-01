@@ -5,15 +5,9 @@
 #include <string>
 #include <utility>
 
-#include <tf2_msgs/msg/tf_message.hpp>
 #include <wavemap/core/utils/profile/profiler_interface.h>
 
 namespace wavemap {
-namespace {
-constexpr const char* kTfTopic = "/tf";
-constexpr const char* kTfStaticTopic = "/tf_static";
-}  // namespace
-
 void RosbagProcessor::addRosbag(const std::string& rosbag_path) {
   auto reader = std::make_unique<rosbag2_cpp::Reader>();
   try {
@@ -56,38 +50,21 @@ bool RosbagProcessor::bagsContainTopic(const std::string& topic_name) {
       });
 }
 
-void RosbagProcessor::addTfInjector(
-    std::shared_ptr<TfTransformer> transformer) {
-  // The authority string is what tf2 reports when it complains about
-  // conflicting or extrapolated transforms, so it is worth making it say
-  // where the transforms actually came from.
-  auto inject = [transformer](const tf2_msgs::msg::TFMessage& tf_msg,
-                              bool is_static) {
-    for (const auto& transform : tf_msg.transforms) {
-      transformer->setTransform(transform, "rosbag", is_static);
-    }
-  };
-  addCallback<tf2_msgs::msg::TFMessage>(
-      kTfTopic, [inject](const tf2_msgs::msg::TFMessage& tf_msg) {
-        inject(tf_msg, /*is_static*/ false);
-      });
-  addCallback<tf2_msgs::msg::TFMessage>(
-      kTfStaticTopic, [inject](const tf2_msgs::msg::TFMessage& tf_msg) {
-        inject(tf_msg, /*is_static*/ true);
-      });
-}
-
 void RosbagProcessor::addRepublisher(const std::string& rosbag_topic_name,
                                      const std::string& republished_topic_name,
                                      const std::string& message_type,
-                                     unsigned int queue_size) {
+                                     unsigned int queue_size,
+                                     bool transient_local) {
   // NOTE: A generic publisher, so the message type does not have to be known
   //       at compile time. ROS1 templated this on the message type; rosbag2
   //       already carries the type name in its metadata, so it need not be.
+  rclcpp::QoS qos(queue_size);
+  if (transient_local) {
+    qos.transient_local();
+  }
   republishers_.try_emplace(
-      rosbag_topic_name,
-      node_.create_generic_publisher(republished_topic_name, message_type,
-                                     rclcpp::QoS(queue_size)));
+      rosbag_topic_name, node_.create_generic_publisher(republished_topic_name,
+                                                        message_type, qos));
 }
 
 std::shared_ptr<rosbag2_storage::SerializedBagMessage>

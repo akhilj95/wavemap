@@ -24,25 +24,15 @@ int main(int argc, char** argv) {
 
   auto node = std::make_shared<rclcpp::Node>("wavemap");
 
-  // Build a transformer with no TransformListener, fed directly from the bag.
-  //
-  // NOTE: The clock is a standalone RCL_SYSTEM_TIME clock, deliberately not
-  //       node->get_clock(). tf2_ros::Buffer registers a jump callback with
-  //       on_clock_change set, and Buffer::onTimeJump clears the buffer when
-  //       ROS time is activated -- which, under use_sim_time, happens the
-  //       moment the first /clock message lands. Measured behaviour of that
-  //       clear: transforms inserted as static survive it (tf2's static cache
-  //       ignores clearList()), but every dynamic transform is dropped. That
-  //       is the damaging half here, because a dataset's odometry is dynamic
-  //       TF -- for Newer College Cloister, a 138Hz camera_init->
-  //       imu_forward_prop stream that is the only thing tying the sensor to
-  //       the world frame.
-  //
-  //       Offline lookups always pass an explicit timestamp and never block,
-  //       so the buffer's own clock is never actually consulted. A clock that
-  //       cannot change type sidesteps the whole problem.
+  // Live TransformListener, as in ROS1, so launch-time nodes like
+  // static_transform_publisher work unmodified in batch mode too. The buffer
+  // clock is a standalone RCL_SYSTEM_TIME clock rather than node->get_clock():
+  // under use_sim_time, tf2_ros::Buffer clears every *dynamic* transform the
+  // moment the node's own clock switches from system to ROS time, i.e. the
+  // instant the first /clock message lands (its static cache survives that
+  // clear). See TfTransformer's two-arg constructor.
   auto transformer = std::make_shared<TfTransformer>(
-      std::make_shared<rclcpp::Clock>(RCL_SYSTEM_TIME));
+      *node, std::make_shared<rclcpp::Clock>(RCL_SYSTEM_TIME));
 
   // Setup the wavemap server node
   RosServer wavemap_server(*node, transformer);
@@ -99,11 +89,18 @@ int main(int argc, char** argv) {
     ++input_idx;
   }
 
-  // Feed TFs straight into the transformer's buffer, rather than republishing
-  // them onto /tf for our own listener to read back. ROS1 had to take the
-  // round-trip; we do not, and skipping it removes both a source of ordering
-  // nondeterminism and the chance of a foreign /tf publisher joining in.
-  rosbag_processor.addTfInjector(transformer);
+  // Republish TFs, exactly as ROS1's rosbag_processor.cc does: the bag's /tf
+  // and /tf_static go back out onto the live topics of the same name, for
+  // our own TransformListener (inside transformer) to pick up. The
+  // republished /tf_static is created transient_local regardless of how the
+  // bag itself recorded that topic -- see the note on addRepublisher() --
+  // so a bag recorded as volatile (issues.md, "/tf_static QoS") works here
+  // even though it silently drops every static transform under
+  // `ros2 bag play`.
+  rosbag_processor.addRepublisher("/tf", "/tf", "tf2_msgs/msg/TFMessage", 10);
+  rosbag_processor.addRepublisher("/tf_static", "/tf_static",
+                                  "tf2_msgs/msg/TFMessage", 10,
+                                  /*transient_local=*/true);
 
   if (!rosbag_processor.bagsContainTopic("/clock")) {
     rosbag_processor.enableSimulatedClock();
