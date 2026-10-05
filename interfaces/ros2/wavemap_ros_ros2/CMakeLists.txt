@@ -107,7 +107,7 @@ install(TARGETS ${PROJECT_NAME}
     RUNTIME DESTINATION bin)
 install(TARGETS ros_server rosbag_processor
     DESTINATION lib/${PROJECT_NAME})
-install(DIRECTORY include/${PROJECT_NAME}
+install(DIRECTORY include/${PROJECT_NAME}/
     DESTINATION include/${PROJECT_NAME})
 install(DIRECTORY launch config
     DESTINATION share/${PROJECT_NAME})

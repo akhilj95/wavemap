@@ -102,7 +102,10 @@ int main(int argc, char** argv) {
                                   "tf2_msgs/msg/TFMessage", 10,
                                   /*transient_local=*/true);
 
-  if (!rosbag_processor.bagsContainTopic("/clock")) {
+  if (rosbag_processor.bagsContainTopic("/clock")) {
+    rosbag_processor.addRepublisher("/clock", "/clock",
+                                    "rosgraph_msgs/msg/Clock", 1);
+  } else {
     rosbag_processor.enableSimulatedClock();
   }
 

@@ -137,6 +137,15 @@ bool RosbagProcessor::processAll() {
         simulated_clock_pub_->publish(clock_msg);
       }
 
+      // Process node callbacks (publishers, timers, /clock delivery, and
+      // crucially delivering this batch's republished /tf messages to our
+      // own TransformListener) before draining the input queues below, so
+      // their transform lookups see the up-to-date tf_buffer_.
+      {
+        ProfilerZoneScopedN("rosbagSpinSome");
+        rclcpp::spin_some(node_.get_node_base_interface());
+      }
+
       // Drain the input queues. Replaces ROS1's reliance on a ros::Timer
       // firing inside spinOnce(); see the note in rosbag_processor.h.
       {
@@ -144,12 +153,6 @@ bool RosbagProcessor::processAll() {
         for (const auto& flusher : queue_flushers_) {
           flusher();
         }
-      }
-
-      // Process node callbacks (publishers, timers, /clock delivery, ...)
-      {
-        ProfilerZoneScopedN("rosbagSpinSome");
-        rclcpp::spin_some(node_.get_node_base_interface());
       }
     }
   }

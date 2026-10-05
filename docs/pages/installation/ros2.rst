@@ -113,7 +113,7 @@ To run one of the Newer College dataset demos (cloister, math, mine or park), co
 
     ros2 launch wavemap_ros_ros2 newer_college_os0_cloister.launch.xml rosbag_dir:=/path/to/converted/cloister
 
-By default these process the bags in batch mode, using the odometry bag to resolve LiDAR poses. In batch mode, the fixed transforms the sensor rig normally supplies live are instead baked into a short-lived rosbag spanning the input bags' time range, since the batch processor takes TF only from the bags it reads, not from the ROS graph.
+By default these process the bags in batch mode, using the odometry bag to resolve LiDAR poses. In batch mode, the fixed transforms the sensor rig normally supplies live are instead published by ``static_transform_publisher`` nodes started alongside the rosbag processor, and the bags' own ``/tf``/``/tf_static`` are republished onto the ROS graph, since the batch processor takes TF from a live ``TransformListener`` rather than reading it out of the bags directly.
 
 Using ROS1 rosbags
 ******************
@@ -132,3 +132,7 @@ The resulting ``your_bag`` directory can be passed to ``rosbag_path`` like any o
     Otherwise, wavemap never receives these transforms.
     Instead, it reports that frames such as ``odom`` do not exist and skips every input.
     This can be fixed at replay time with ``ros2 bag play --qos-profile-overrides-path``.
+
+.. note::
+
+    ``wavemap_server.launch.xml`` sets ``FASTDDS_BUILTIN_TRANSPORTS=UDPv4`` on the ``wavemap`` node because Fast DDS's default shared-memory transport silently drops most of a large best-effort topic (e.g. Ouster pointclouds) once the node falls behind. If you run ``ros_server`` directly, or write your own launch files around it instead of including ``wavemap_server.launch.xml``, set this environment variable yourself to avoid silent data loss.

@@ -17,6 +17,11 @@ RosLoggingLevel::operator LoggingLevel() const {
 
 void RosLoggingLevel::applyToGlog() const {
   operator LoggingLevel().applyToGlog();
+  // LoggingLevel::applyToGlog() only sets FLAGS_minloglevel, which does not
+  // gate VLOG(...) statements (used here in place of ROS1's
+  // ROS_DEBUG_STREAM). Toggle glog's verbosity separately so that
+  // logging_level: debug actually enables them.
+  FLAGS_v = (id_ == Id::kDebug) ? 1 : 0;
 }
 
 bool RosLoggingLevel::applyToRosConsole(const std::string& logger_name) const {

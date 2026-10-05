@@ -80,7 +80,7 @@ install(TARGETS ${PROJECT_NAME}
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
     RUNTIME DESTINATION bin)
-install(DIRECTORY include/${PROJECT_NAME}
+install(DIRECTORY include/${PROJECT_NAME}/
     DESTINATION include/${PROJECT_NAME})
 # RViz2 looks up a display's icon at share/<package>/icons/classes/<Class>.png
 install(DIRECTORY icons/

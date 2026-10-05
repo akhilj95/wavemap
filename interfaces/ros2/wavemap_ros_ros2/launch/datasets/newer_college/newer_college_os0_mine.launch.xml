@@ -8,9 +8,9 @@
   <!-- NOTE: Relative paths will be resolved w.r.t. ROS_HOME (default ~/.ros) -->
   <arg name="rosbag_dir" default="../data/newer_college/2021-ouster-os0-128-alphasense/collection4/easy"
        description="Path to the directory containing the rosbags."/>
-  <arg name="odom_rosbag" default="$(var rosbag_dir)/nc_mine_easy_fast_lio_odom.bag"
+  <arg name="odom_rosbag" default="$(var rosbag_dir)/nc_mine_easy_fast_lio_odom"
        description="Path to the rosbag containing odometry, to resolve the LiDAR poses and undistort the pointclouds."/>
-  <arg name="first_rosbag" default="$(var rosbag_dir)/2021-04-12-11-06-47-easy.bag"
+  <arg name="first_rosbag" default="$(var rosbag_dir)/2021-04-12-11-06-47-easy"
        description="Path to the first rosbag of the dataset. If only_first_rosbag:=true, only this bag will be processed."/>
   <arg name="remaining_rosbags" default=""
        description="Path to all remaining rosbags."/>
