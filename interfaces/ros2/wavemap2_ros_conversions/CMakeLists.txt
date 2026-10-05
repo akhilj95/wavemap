@@ -36,7 +36,7 @@ add_library(${PROJECT_NAME} SHARED
 set_wavemap_target_properties(${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include/${PROJECT_NAME}>)
+    $<INSTALL_INTERFACE:include>)
 target_link_libraries(${PROJECT_NAME} PUBLIC
     wavemap2::wavemap_core
     wavemap2::wavemap_io
@@ -104,7 +104,7 @@ install(DIRECTORY include/${PROJECT_NAME}/
     DESTINATION include/${PROJECT_NAME})
 
 ament_export_targets(${PROJECT_NAME}-targets HAS_LIBRARY_TARGET)
-ament_export_include_directories(include/${PROJECT_NAME})
+ament_export_include_directories(include)
 ament_export_dependencies(
     wavemap2 wavemap2_msgs rclcpp geometry_msgs std_msgs)
 
