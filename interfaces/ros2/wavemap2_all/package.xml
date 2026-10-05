@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='utf-8'?>
+<package format="3">
+  <name>wavemap2_all</name>
+  <version>2.2.1</version>
+  <description>Metapackage that builds all wavemap ROS 2 packages.</description>
+
+  <maintainer email="akhilmjohn@gmail.com">Akhil John</maintainer>
+  <license>BSD</license>
+  <url>https://github.com/ethz-asl/wavemap</url>
+
+  <author email="akhilmjohn@gmail.com">Akhil John</author>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <exec_depend>wavemap2</exec_depend>
+  <exec_depend>wavemap2_msgs</exec_depend>
+  <exec_depend>wavemap2_ros_conversions</exec_depend>
+  <exec_depend>wavemap2_ros</exec_depend>
+  <exec_depend>wavemap2_rviz_plugin</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

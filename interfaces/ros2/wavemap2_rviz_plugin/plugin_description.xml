@@ -1,0 +1,10 @@
+<library path="wavemap2_rviz_plugin">
+  <class name="wavemap2_rviz_plugin/WavemapMap"
+         type="wavemap::rviz_plugin::WavemapMapDisplay"
+         base_class_type="rviz_common::Display">
+    <description>
+      Displays maps published in wavemap's native format.
+    </description>
+    <message_type>wavemap2_msgs/msg/Map</message_type>
+  </class>
+</library>

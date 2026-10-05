@@ -40,15 +40,15 @@ elseif ("$ENV{ROS_VERSION}" STREQUAL "2")
   #       the subtree below any it finds, so it never reads this file at all.
 
   # ROS interfaces and tooling
-  add_subdirectory(interfaces/ros2/wavemap_ros2)
-  add_subdirectory(interfaces/ros2/wavemap_msgs_ros2)
-  add_subdirectory(interfaces/ros2/wavemap_ros_conversions_ros2)
-  add_subdirectory(interfaces/ros2/wavemap_ros_ros2)
-  add_subdirectory(interfaces/ros2/wavemap_rviz_plugin_ros2)
+  add_subdirectory(interfaces/ros2/wavemap2)
+  add_subdirectory(interfaces/ros2/wavemap2_msgs)
+  add_subdirectory(interfaces/ros2/wavemap2_ros_conversions)
+  add_subdirectory(interfaces/ros2/wavemap2_ros)
+  add_subdirectory(interfaces/ros2/wavemap2_rviz_plugin)
 
   # Libraries
   # NOTE: Wavemap's C++ lib is already included through
-  #       interfaces/ros2/wavemap_ros2.
+  #       interfaces/ros2/wavemap2.
   add_subdirectory(library/python)
 
   # Usage examples

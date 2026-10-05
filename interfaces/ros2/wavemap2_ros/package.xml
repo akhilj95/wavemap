@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='utf-8'?>
+<package format="3">
+  <name>wavemap2_ros</name>
+  <version>2.2.1</version>
+  <description>ROS 2 interface for wavemap.</description>
+
+  <maintainer email="akhilmjohn@gmail.com">Akhil John</maintainer>
+  <license>BSD</license>
+  <url>https://github.com/ethz-asl/wavemap</url>
+
+  <author email="akhilmjohn@gmail.com">Akhil John</author>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>wavemap2</depend>
+  <depend>wavemap2_msgs</depend>
+  <depend>wavemap2_ros_conversions</depend>
+
+  <depend>rclcpp</depend>
+  <depend>tf2_ros</depend>
+  <depend>tf2_msgs</depend>
+  <depend>image_transport</depend>
+  <depend>cv_bridge</depend>
+
+  <!-- Offline bag processing. Replaces ROS1's `rosbag` dependency. -->
+  <depend>rosbag2_cpp</depend>
+  <depend>rosbag2_storage</depend>
+  <depend>rosgraph_msgs</depend>
+
+  <depend>std_srvs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>visualization_msgs</depend>
+
+  <!-- Launch files: bag replay and the Panoptic Mapping data player. -->
+  <exec_depend>launch_xml</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <exec_depend>ros2bag</exec_depend>
+  <exec_depend>tf2_ros_py</exec_depend>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>python3-numpy</exec_depend>
+  <exec_depend>python3-opencv</exec_depend>
+  <exec_depend>python3-pil</exec_depend>
+
+  <test_depend>ament_cmake_gtest</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

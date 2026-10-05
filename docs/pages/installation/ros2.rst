@@ -25,7 +25,7 @@ The ROS2 image is built from a local copy of the repository::
 
     git clone https://github.com/ethz-asl/wavemap.git
     cd wavemap
-    docker build --target=workspace-built --tag=wavemap_ros2 -f tooling/docker/ros2/full.Dockerfile .
+    docker build --target=workspace-built --tag=wavemap2 -f tooling/docker/ros2/full.Dockerfile .
 
 The ``--target=workspace-built`` argument is required. Without it, Docker builds the file's last stage, which only holds the compiler cache.
 
@@ -79,7 +79,7 @@ Then install the remaining system dependencies using::
 Build all of wavemap's ROS2 packages with::
 
     cd ~/ros2_ws
-    colcon build --packages-up-to wavemap_all_ros2 --cmake-args -DCMAKE_BUILD_TYPE=Release
+    colcon build --packages-up-to wavemap2_all --cmake-args -DCMAKE_BUILD_TYPE=Release
 
 Finally, source the workspace::
 
@@ -87,31 +87,31 @@ Finally, source the workspace::
 
 Running wavemap
 ***************
-All of the example configs from the ROS1 package are installed unmodified, in ``$(ros2 pkg prefix wavemap_ros_ros2)/share/wavemap_ros_ros2/config``.
+All of the example configs from the ROS1 package are installed unmodified, in ``$(ros2 pkg prefix wavemap2_ros)/share/wavemap2_ros/config``.
 Your own ROS1 configs can be used as they are.
 Unlike in ROS1, the config file must always be passed explicitly with ``param_file``.
 
 To run the wavemap server on live data, use::
 
-    ros2 launch wavemap_ros_ros2 wavemap_server.launch.xml param_file:=/path/to/your_config.yaml
+    ros2 launch wavemap2_ros wavemap_server.launch.xml param_file:=/path/to/your_config.yaml
 
 To process one or more rosbags as fast as possible, use::
 
-    ros2 launch wavemap_ros_ros2 rosbag_processor.launch.xml param_file:=/path/to/your_config.yaml rosbag_path:="/path/to/first_bag /path/to/second_bag"
+    ros2 launch wavemap2_ros rosbag_processor.launch.xml param_file:=/path/to/your_config.yaml rosbag_path:="/path/to/first_bag /path/to/second_bag"
 
 As in ROS1, relative rosbag paths are resolved with respect to ``ROS_HOME`` (default ``~/.ros``).
 As in ROS1, the rosbag processor stays alive once it is done, so the map can be inspected in Rviz2, unless ``show_rviz:=false`` is set, in which case it exits.
 While wavemap is running, its map can be saved with::
 
-    ros2 service call /wavemap/save_map wavemap_msgs_ros2/srv/FilePath "{file_path: /path/to/map.wvmp}"
+    ros2 service call /wavemap/save_map wavemap2_msgs/srv/FilePath "{file_path: /path/to/map.wvmp}"
 
 To run the Panoptic Mapping flat dataset demo, download and extract the `flat dataset <https://doi.org/10.3929/ethz-c-000788335>`_, and run::
 
-    ros2 launch wavemap_ros_ros2 panoptic_mapping_rgbd_flat.launch.xml base_path:=/path/to/flat_dataset/run1
+    ros2 launch wavemap2_ros panoptic_mapping_rgbd_flat.launch.xml base_path:=/path/to/flat_dataset/run1
 
 To run one of the Newer College dataset demos (cloister, math, mine or park), convert its sensor and odometry rosbags as described below, and run e.g.::
 
-    ros2 launch wavemap_ros_ros2 newer_college_os0_cloister.launch.xml rosbag_dir:=/path/to/converted/cloister
+    ros2 launch wavemap2_ros newer_college_os0_cloister.launch.xml rosbag_dir:=/path/to/converted/cloister
 
 By default these process the bags in batch mode, using the odometry bag to resolve LiDAR poses. In batch mode, the fixed transforms the sensor rig normally supplies live are instead published by ``static_transform_publisher`` nodes started alongside the rosbag processor, and the bags' own ``/tf``/``/tf_static`` are republished onto the ROS graph, since the batch processor takes TF from a live ``TransformListener`` rather than reading it out of the bags directly.
 

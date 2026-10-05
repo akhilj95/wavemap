@@ -1,0 +1,236 @@
+# RViz2 port of interfaces/ros1/wavemap_ros/config/rviz/default.rviz.
+# NOTE: ROS1's disabled Image and RobotModel displays and its SetInitialPose,
+#       SetGoal and PublishPoint tools are not carried over.
+# NOTE: ROS1's map display set "Show grid"/"Show slice" options that its
+#       plugin no longer has, so RViz1 ignored them and used the defaults.
+#       They are left out here, which gives the same result.
+Panels:
+  - Class: rviz_common/Displays
+    Help Height: 0
+    Name: Displays
+    Property Tree Widget:
+      Expanded:
+        - /Global Options1
+      Splitter Ratio: 0.5
+    Tree Height: 600
+  - Class: rviz_common/Selection
+    Name: Selection
+  - Class: rviz_common/Tool Properties
+    Expanded: ~
+    Name: Tool Properties
+    Splitter Ratio: 0.5886790156364441
+  - Class: rviz_common/Views
+    Expanded:
+      - /Current View1
+    Name: Views
+    Splitter Ratio: 0.5
+  - Class: rviz_common/Time
+    Experimental: false
+    Name: Time
+    SyncMode: 0
+    SyncSource: ""
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Alpha: 0.5
+      Cell Size: 1
+      Class: rviz_default_plugins/Grid
+      Color: 160; 160; 164
+      Enabled: false
+      Line Style:
+        Line Width: 0.029999999329447746
+        Value: Lines
+      Name: Grid
+      Normal Cell Count: 0
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Plane: XY
+      Plane Cell Count: 10
+      Reference Frame: <Fixed Frame>
+      Value: false
+    - Class: rviz_default_plugins/TF
+      Enabled: false
+      Frame Timeout: 15
+      Marker Scale: 1
+      Name: TF
+      Show Arrows: true
+      Show Axes: true
+      Show Names: true
+      Update Interval: 0
+      Value: false
+    - Class: rviz_common/Group
+      Displays:
+        - Alpha: 1
+          Channel Name: reflectivity
+          Class: rviz_default_plugins/PointCloud2
+          Color: 255; 255; 255
+          Color Transformer: FlatColor
+          Decay Time: 0
+          Enabled: false
+          Name: Kinect
+          Size (Pixels): 1
+          Size (m): 0.009999999776482582
+          Style: Points
+          Topic:
+            Depth: 10
+            Durability Policy: Volatile
+            History Policy: Keep Last
+            Reliability Policy: Best Effort
+            Value: /wavemap/depth_cam_input
+          Use Fixed Frame: true
+          Value: false
+        - Alpha: 1
+          Channel Name: reflectivity
+          Class: rviz_default_plugins/PointCloud2
+          Color: 255; 255; 255
+          Color Transformer: FlatColor
+          Decay Time: 1
+          Enabled: true
+          Name: Ouster raw
+          Size (Pixels): 1
+          Size (m): 0.009999999776482582
+          Style: Points
+          Topic:
+            Depth: 10
+            Durability Policy: Volatile
+            History Policy: Keep Last
+            Reliability Policy: Best Effort
+            Value: /os_cloud_node/points
+          Use Fixed Frame: true
+          Value: true
+        - Alpha: 1
+          Channel Name: reflectivity
+          Class: rviz_default_plugins/PointCloud2
+          Color: 255; 255; 255
+          Color Transformer: FlatColor
+          Decay Time: 1
+          Enabled: true
+          Name: Ouster undistorted
+          Size (Pixels): 1
+          Size (m): 0.009999999776482582
+          Style: Points
+          Topic:
+            Depth: 10
+            Durability Policy: Volatile
+            History Policy: Keep Last
+            Reliability Policy: Best Effort
+            Value: /wavemap/reprojected_pointcloud
+          Use Fixed Frame: true
+          Value: true
+        - Alpha: 1
+          Channel Name: reflectivity
+          Class: rviz_default_plugins/PointCloud2
+          Color: 255; 255; 255
+          Color Transformer: FlatColor
+          Decay Time: 1000
+          Enabled: true
+          Name: LIO
+          Size (Pixels): 1
+          Size (m): 0.009999999776482582
+          Style: Points
+          Topic:
+            Depth: 10
+            Durability Policy: Volatile
+            History Policy: Keep Last
+            Reliability Policy: Best Effort
+            Value: /cloud_registered
+          Use Fixed Frame: true
+          Value: true
+      Enabled: false
+      Name: Input
+    - Class: rviz_common/Group
+      Displays:
+        - Class: wavemap2_rviz_plugin/WavemapMap
+          Enabled: true
+          Name: Map
+          Topic:
+            Depth: 10
+            Durability Policy: Volatile
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /wavemap/map
+          Value: true
+        - Class: rviz_default_plugins/MarkerArray
+          Enabled: false
+          Name: Estimate
+          Namespaces:
+            {}
+          Topic:
+            Depth: 100
+            Durability Policy: Volatile
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /wavemap/occupancy_grid
+          Value: false
+        - Class: rviz_default_plugins/MarkerArray
+          Enabled: false
+          Name: Ground truth
+          Namespaces:
+            {}
+          Topic:
+            Depth: 100
+            Durability Policy: Volatile
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /wavemap/occupancy_grid_ground_truth
+          Value: false
+        - Class: rviz_default_plugins/MarkerArray
+          Enabled: false
+          Name: Error
+          Namespaces:
+            {}
+          Topic:
+            Depth: 100
+            Durability Policy: Volatile
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /wavemap/occupancy_grid_error
+          Value: false
+      Enabled: true
+      Name: Occupancy grid
+  Enabled: true
+  Global Options:
+    Background Color: 243; 243; 243
+    Fixed Frame: odom
+    Frame Rate: 30
+  Name: root
+  Tools:
+    - Class: rviz_default_plugins/Interact
+      Hide Inactive Objects: true
+    - Class: rviz_default_plugins/MoveCamera
+    - Class: rviz_default_plugins/Select
+    - Class: rviz_default_plugins/FocusCamera
+    - Class: rviz_default_plugins/Measure
+      Line color: 128; 128; 0
+  Transformation:
+    Current:
+      Class: rviz_default_plugins/TF
+  Value: true
+  Views:
+    Current:
+      Class: rviz_default_plugins/XYOrbit
+      Distance: 72.77584838867188
+      Enable Stereo Rendering:
+        Stereo Eye Separation: 0.05999999865889549
+        Stereo Focal Distance: 1
+        Swap Stereo Eyes: false
+        Value: false
+      Focal Point:
+        X: -1
+        Y: -1.4901161193847656e-08
+        Z: 0
+      Focal Shape Fixed Size: true
+      Focal Shape Size: 0.05000000074505806
+      Invert Z Axis: false
+      Name: Current View
+      Near Clip Distance: 0.009999999776482582
+      Pitch: 0.5153990983963013
+      Target Frame: <Fixed Frame>
+      Value: XYOrbit (rviz_default_plugins)
+      Yaw: 4.9065022468566895
+    Saved: ~
+Window Geometry:
+  Height: 1000
+  Width: 1600

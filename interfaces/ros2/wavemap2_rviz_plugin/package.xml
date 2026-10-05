@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='utf-8'?>
+<package format="3">
+  <name>wavemap2_rviz_plugin</name>
+  <version>2.2.1</version>
+  <description>Plugin to interactively visualize maps published in wavemap's
+    native format, for RViz2.
+  </description>
+
+  <maintainer email="akhilmjohn@gmail.com">Akhil John</maintainer>
+  <license>BSD</license>
+  <url>https://github.com/ethz-asl/wavemap</url>
+
+  <author email="victorr@ethz.ch">Victor Reijgwart</author>
+  <author email="akhilmjohn@gmail.com">Akhil John</author>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>wavemap2</depend>
+  <depend>wavemap2_msgs</depend>
+  <depend>wavemap2_ros_conversions</depend>
+
+  <depend>rclcpp</depend>
+  <depend>rviz_common</depend>
+  <depend>rviz_rendering</depend>
+  <depend>rviz_ogre_vendor</depend>
+  <depend>pluginlib</depend>
+  <depend>std_srvs</depend>
+  <depend>qtbase5-dev</depend>
+  <!-- ROS1's rviz package also provided the executable. In ROS2 it is split
+       out, and the launch files' show_rviz starts it. -->
+  <exec_depend>rviz2</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

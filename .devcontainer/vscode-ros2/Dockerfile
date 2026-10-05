@@ -1,6 +1,6 @@
 ARG VERSION=latest
 
-FROM ghcr.io/ethz-asl/wavemap_ros2:${VERSION}
+FROM ghcr.io/ethz-asl/wavemap2:${VERSION}
 
 # Create a non-root user and make it the default user
 # NOTE: The ROS2 base image already ships an 'ubuntu' user with UID/GID 1000,
@@ -23,5 +23,5 @@ USER $USERNAME
 # Build the package
 WORKDIR /home/$USERNAME/ros2_ws
 RUN . /opt/ros/jazzy/setup.sh && \
-    colcon build --packages-up-to wavemap_all_ros2 \
+    colcon build --packages-up-to wavemap2_all \
       --cmake-args -DCMAKE_BUILD_TYPE=Release

@@ -1,0 +1,20 @@
+<launch>
+  <!-- Dataset params -->
+  <arg name="only_first_rosbag"
+       default="false"
+       description="If true, replay only the first rosbag in the dataset. If false, replay everything."/>
+
+  <!-- Rosbag paths -->
+  <!-- NOTE: Relative paths will be resolved w.r.t. ROS_HOME (default ~/.ros) -->
+  <arg name="rosbag_dir" default="../data/newer_college/2021-ouster-os0-128-alphasense/collection3/easy"
+       description="Path to the directory containing the rosbags."/>
+  <arg name="odom_rosbag" default="$(var rosbag_dir)/nc_math_easy_fast_lio_odom"
+       description="Path to the rosbag containing odometry, to resolve the LiDAR poses and undistort the pointclouds."/>
+  <arg name="first_rosbag" default="$(var rosbag_dir)/2021-04-07-13-49-03_0-math-easy"
+       description="Path to the first rosbag of the dataset. If only_first_rosbag:=true, only this bag will be processed."/>
+  <arg name="remaining_rosbags" default="$(var rosbag_dir)/2021-04-07-13-52-31_1-math-easy"
+       description="Path to all remaining rosbags."/>
+
+  <!-- Launch default Newer College OS0 setup -->
+  <include file="$(find-pkg-share wavemap2_ros)/launch/datasets/newer_college/newer_college_os0_base.launch.xml"/>
+</launch>

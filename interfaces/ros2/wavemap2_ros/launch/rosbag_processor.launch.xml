@@ -1,0 +1,72 @@
+<launch>
+  <!-- General arguments -->
+  <!-- NOTE: ROS1's default pointed at config/wavemap_server.yaml, which
+             does not exist. Left empty here, which the node rejects. It
+             cannot be a required arg: ROS2 only counts required args passed
+             explicitly by an include, not ones inherited from the parent. -->
+  <arg name="param_file"
+       default=""
+       description="Name of the file from which to read wavemap's server params."/>
+  <arg name="debug_mode"
+       default="false"
+       description="Run the mapper in a debugger (gdb)."/>
+  <arg name="show_rviz"
+       default="true"
+       description="Automatically launch Rviz."/>
+  <arg name="rviz_config"
+       default="$(find-pkg-share wavemap2_ros)/config/rviz/default.rviz"/>
+  <arg name="exit_when_done"
+       default="true"
+       description="Shutdown ROS when wavemap exits."/>
+
+  <!-- Dataset params -->
+  <arg name="rosbag_path"
+       default=""
+       description="Replay the rosbag(s) at the specified path(s), separated by spaces."/>
+
+  <!-- ROS1 nodes ran in ROS_HOME, so relative rosbag paths resolved there.
+       ROS2 processes run in the launching shell's directory instead. -->
+  <let name="ros_home" value="$(env ROS_HOME $(env HOME)/.ros)"/>
+  <let name="rosbag_path_resolved"
+       value="$(eval '\' \'.join(__import__(\'os\').path.join(\'$(var ros_home)\', p) for p in \'$(var rosbag_path)\'.split())')"/>
+
+  <!-- Process the rosbag with wavemap as fast as possible -->
+  <!-- NOTE: ROS1 set the global /use_sim_time here. ROS2 has no global
+             params, so it is passed to every node below instead. -->
+  <group>
+    <let if="$(var debug_mode)" name="launch_prefix"
+         value="gdb -ex run --args"/>
+    <let unless="$(var debug_mode)" name="launch_prefix" value=""/>
+
+    <!-- NOTE: ROS1's required="$(arg exit_when_done)". ROS2's on_exit does
+               not take substitutions, hence the two variants. -->
+    <node if="$(var exit_when_done)" on_exit="shutdown"
+          name="wavemap" pkg="wavemap2_ros"
+          exec="rosbag_processor"
+          output="screen"
+          launch-prefix="$(var launch_prefix)">
+      <param name="general.config_file" value="$(var param_file)"/>
+      <param name="rosbag_path" value="$(var rosbag_path_resolved)"/>
+      <param name="keep_alive" value="$(var show_rviz)"/>
+      <param name="use_sim_time" value="true"/>
+    </node>
+    <node unless="$(var exit_when_done)"
+          name="wavemap" pkg="wavemap2_ros"
+          exec="rosbag_processor"
+          output="screen"
+          launch-prefix="$(var launch_prefix)">
+      <param name="general.config_file" value="$(var param_file)"/>
+      <param name="rosbag_path" value="$(var rosbag_path_resolved)"/>
+      <param name="keep_alive" value="$(var show_rviz)"/>
+      <param name="use_sim_time" value="true"/>
+    </node>
+  </group>
+
+  <!-- Show Rviz -->
+  <group if="$(var show_rviz)">
+    <node pkg="rviz2" exec="rviz2" name="$(anon rviz)" output="screen"
+          args="-d $(var rviz_config)">
+      <param name="use_sim_time" value="true"/>
+    </node>
+  </group>
+</launch>

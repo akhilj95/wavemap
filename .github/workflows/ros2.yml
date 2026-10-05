@@ -11,8 +11,8 @@ on:
 env:
   REPOSITORY_NAME: wavemap
   DOCKER_REGISTRY: ghcr.io
-  DOCKER_CI_IMAGE_NAME: ci_wavemap_ros2
-  DOCKER_RELEASE_IMAGE_NAME: wavemap_ros2
+  DOCKER_CI_IMAGE_NAME: ci_wavemap2
+  DOCKER_RELEASE_IMAGE_NAME: wavemap2
   USER_HOME: /home/ci
   REPOSITORY_PATH: /home/ci/wavemap
   COLCON_WS_PATH: /home/ci/ros2_ws
@@ -143,7 +143,7 @@ jobs:
         run: |
           . /opt/ros/jazzy/setup.sh
           echo "::add-matcher::./.github/problem-matchers/gcc.json"
-          colcon build --packages-up-to wavemap_all_ros2 \
+          colcon build --packages-up-to wavemap2_all \
             --event-handlers console_cohesion+ \
             --cmake-args -DCMAKE_BUILD_TYPE=Release
           echo "::remove-matcher owner=problem-matcher-gcc::"
@@ -177,7 +177,7 @@ jobs:
           . /opt/ros/jazzy/setup.sh
           rm -rf build install log
           echo "::add-matcher::./.github/problem-matchers/gcc.json"
-          colcon build --packages-up-to wavemap_all_ros2 --merge-install \
+          colcon build --packages-up-to wavemap2_all --merge-install \
             --event-handlers console_cohesion+ \
             --cmake-args -DCMAKE_BUILD_TYPE=Release
           echo "::remove-matcher owner=problem-matcher-gcc::"
@@ -207,7 +207,7 @@ jobs:
         run: |
           . /opt/ros/jazzy/setup.sh
           echo "::add-matcher::./.github/problem-matchers/gcc.json"
-          colcon build --packages-up-to wavemap_all_ros2 \
+          colcon build --packages-up-to wavemap2_all \
             --event-handlers console_cohesion+ \
             --cmake-args -DCMAKE_BUILD_TYPE=Release -DDCHECK_ALWAYS_ON=ON -DBUILD_TESTING=ON
           echo "::remove-matcher owner=problem-matcher-gcc::"
@@ -217,7 +217,7 @@ jobs:
         shell: bash
         run: |
           . /opt/ros/jazzy/setup.sh
-          colcon test --packages-up-to wavemap_all_ros2 \
+          colcon test --packages-up-to wavemap2_all \
             --event-handlers console_cohesion+ \
             --ctest-args --output-on-failure
           colcon test-result --verbose
