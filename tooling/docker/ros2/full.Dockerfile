@@ -5,7 +5,7 @@ ARG REPOSITORY_PATH=${USER_HOME}/${REPOSITORY_NAME}
 ARG COLCON_WS_PATH=${USER_HOME}/ros2_ws
 ARG CCACHE_DIR=${USER_HOME}/ccache
 ARG ROS_HOME=${USER_HOME}/.ros
-ARG PACKAGE_NAME=wavemap_all_ros2
+ARG PACKAGE_NAME=wavemap2_all
 
 # NOTE: Unlike the ROS1 image, the repository does not live inside the
 #       workspace's src/ folder. The repo root's CMakeLists.txt would make
