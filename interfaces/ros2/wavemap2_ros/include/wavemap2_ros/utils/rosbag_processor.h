@@ -48,6 +48,7 @@ namespace wavemap {
 class RosbagProcessor {
  public:
   explicit RosbagProcessor(rclcpp::Node& node) : node_(node) {}
+  ~RosbagProcessor();
 
   void addRosbag(const std::string& rosbag_path);
   bool addRosbags(std::istringstream& rosbag_paths);

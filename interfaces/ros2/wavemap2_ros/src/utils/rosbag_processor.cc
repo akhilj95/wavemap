@@ -8,6 +8,10 @@
 #include <wavemap/core/utils/profile/profiler_interface.h>
 
 namespace wavemap {
+RosbagProcessor::~RosbagProcessor() {
+  RCLCPP_INFO(node_.get_logger(), "Shutting down...");
+}
+
 void RosbagProcessor::addRosbag(const std::string& rosbag_path) {
   auto reader = std::make_unique<rosbag2_cpp::Reader>();
   try {

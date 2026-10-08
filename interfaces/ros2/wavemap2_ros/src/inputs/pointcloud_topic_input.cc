@@ -275,15 +275,24 @@ void PointcloudTopicInput::processQueue() {
     }
 
     // Integrate the pointcloud
+    // NOTE: timebase_ns is this cloud's own (bag/sim) timestamp, logged as a
+    //       raw integer (not seconds-as-double, which glog's default <<
+    //       precision rounds to ~6 significant digits -- not enough to tell
+    //       sub-second timestamps apart) so the first few clouds of a run
+    //       can be compared against ROS1's equivalent sim-time (ROS1 gets
+    //       this for free from rosconsole's [wall, sim] prefix; glog has no
+    //       sim-time concept, so it has to be logged explicitly here).
+    const uint64_t timebase_ns = oldest_msg.getTimeBase();
     VLOG(1) << "Inserting pointcloud with " << posed_pointcloud.size()
-            << " points. Remaining pointclouds in queue: "
+            << " points, timebase " << timebase_ns
+            << "ns. Remaining pointclouds in queue: "
             << pointcloud_queue_.size() - 1 << ".";
     integration_timer_.start();
     pipeline_->runPipeline(config_.measurement_integrator_names,
                            posed_pointcloud);
     integration_timer_.stop();
-    VLOG(1) << "Integrated new pointcloud in "
-            << integration_timer_.getLastEpisodeDuration()
+    VLOG(1) << "Integrated new pointcloud (timebase " << timebase_ns
+            << "ns) in " << integration_timer_.getLastEpisodeDuration()
             << "s. Total integration time: "
             << integration_timer_.getTotalDuration() << "s.";
 
