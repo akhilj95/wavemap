@@ -56,6 +56,8 @@ class CropMapOperation : public MapOperationBase {
   // default-constructed.
   rclcpp::Clock::SharedPtr clock_;
   rclcpp::Time last_run_timestamp_;
+
+  const rclcpp::Logger logger_;
 };
 }  // namespace wavemap
 

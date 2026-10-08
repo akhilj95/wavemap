@@ -5,6 +5,7 @@
 #include <optional>
 #include <string>
 
+#include <rclcpp/logger.hpp>
 #include <wavemap/core/config/config_base.h>
 
 // Replaces ROS1's XmlRpc-based converter
@@ -30,10 +31,14 @@ namespace wavemap::param::convert {
 // caller can report the failure rather than silently proceeding with an empty
 // config.
 std::optional<param::Value> yamlFileToParams(
-    const std::filesystem::path& file_path);
+    const std::filesystem::path& file_path,
+    const rclcpp::Logger& logger =
+        rclcpp::get_logger("wavemap2_ros_conversions"));
 
 // As above, for YAML held in memory. Mainly useful for tests.
-std::optional<param::Value> yamlStringToParams(const std::string& yaml);
+std::optional<param::Value> yamlStringToParams(
+    const std::string& yaml, const rclcpp::Logger& logger = rclcpp::get_logger(
+                                 "wavemap2_ros_conversions"));
 }  // namespace wavemap::param::convert
 
 #endif  // WAVEMAP_ROS_CONVERSIONS_ROS2_CONFIG_CONVERSIONS_H_

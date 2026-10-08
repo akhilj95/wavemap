@@ -74,6 +74,8 @@ class TfTransformer {
   std::optional<Transformation3D> lookupTransformImpl(
       const std::string& to_frame_id, const std::string& from_frame_id,
       const tf2::TimePoint& frame_timestamp);
+
+  const rclcpp::Logger logger_;
 };
 }  // namespace wavemap
 

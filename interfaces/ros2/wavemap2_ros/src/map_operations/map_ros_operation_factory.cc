@@ -44,7 +44,8 @@ std::unique_ptr<MapOperationBase> MapRosOperationFactory::create(
             config.value(), std::move(occupancy_map), std::move(thread_pool),
             std::move(world_frame), node);
       } else {
-        LOG(ERROR) << "Publish map operation config could not be loaded.";
+        RCLCPP_ERROR(node.get_logger(),
+                     "Publish map operation config could not be loaded.");
         return nullptr;
       }
     case MapRosOperationType::kPublishPointcloud:
@@ -54,8 +55,9 @@ std::unique_ptr<MapOperationBase> MapRosOperationFactory::create(
             config.value(), std::move(occupancy_map), std::move(world_frame),
             node);
       } else {
-        LOG(ERROR) << "Publish pointcloud operation config could not be "
-                      "loaded.";
+        RCLCPP_ERROR(node.get_logger(),
+                     "Publish pointcloud operation config could not be "
+                     "loaded.");
         return nullptr;
       }
     case MapRosOperationType::kCropMap:
@@ -64,7 +66,8 @@ std::unique_ptr<MapOperationBase> MapRosOperationFactory::create(
             config.value(), std::move(occupancy_map), std::move(transformer),
             std::move(world_frame), node);
       } else {
-        LOG(ERROR) << "Crop map operation config could not be loaded.";
+        RCLCPP_ERROR(node.get_logger(),
+                     "Crop map operation config could not be loaded.");
         return nullptr;
       }
   }

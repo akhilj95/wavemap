@@ -59,6 +59,9 @@ class PublishMapOperation : public MapOperationBase {
   rclcpp::Clock::SharedPtr clock_;
   rclcpp::Time last_run_timestamp_;
 
+  // Passed to convert::mapToRosMsg, which logs through it.
+  const rclcpp::Logger conversions_logger_;
+
   // Map publishing
   rclcpp::Publisher<wavemap2_msgs::msg::Map>::SharedPtr map_pub_;
   Timestamp last_run_timestamp_internal_;

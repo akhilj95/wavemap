@@ -28,7 +28,8 @@ TfTransformer::TfTransformer(rclcpp::Node& node,
                              FloatingPoint tf_buffer_cache_time)
     : tf_buffer_(std::move(buffer_clock), toTf2Duration(tf_buffer_cache_time)),
       tf_listener_(
-          std::make_unique<tf2_ros::TransformListener>(tf_buffer_, &node)) {}
+          std::make_unique<tf2_ros::TransformListener>(tf_buffer_, &node)),
+      logger_(node.get_logger()) {}
 
 bool TfTransformer::isTransformAvailable(
     const std::string& to_frame_id, const std::string& from_frame_id,
@@ -83,13 +84,14 @@ bool TfTransformer::waitForTransformImpl(
     std::this_thread::sleep_for(transform_lookup_retry_period_);
     t_waited += transform_lookup_retry_period_;
   }
-  LOG(WARNING) << "Waited " << t_waited.count()
-               << "s, but still could not get the TF from " << from_frame_id
-               << " to " << to_frame_id << " at timestamp "
-               << std::chrono::duration_cast<std::chrono::seconds>(
-                      frame_timestamp.time_since_epoch())
-                      .count()
-               << " seconds";
+  RCLCPP_WARN_STREAM(
+      logger_,
+      "Waited " << t_waited.count() << "s, but still could not get the TF from "
+                << from_frame_id << " to " << to_frame_id << " at timestamp "
+                << std::chrono::duration_cast<std::chrono::seconds>(
+                       frame_timestamp.time_since_epoch())
+                       .count()
+                << " seconds");
   return false;
 }
 

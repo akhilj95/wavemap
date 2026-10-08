@@ -74,6 +74,7 @@ class RosInputBase {
 
   const std::shared_ptr<TfTransformer> transformer_;
   const std::string world_frame_;
+  const rclcpp::Logger logger_;
 
   virtual void processQueue() = 0;
   rclcpp::TimerBase::SharedPtr queue_processing_retry_timer_;

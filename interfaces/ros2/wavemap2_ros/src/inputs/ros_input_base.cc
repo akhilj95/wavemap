@@ -30,7 +30,8 @@ RosInputBase::RosInputBase(const RosInputBaseConfig& config,
     : config_(config.checkValid()),
       pipeline_(std::move(pipeline)),
       transformer_(std::move(transformer)),
-      world_frame_(std::move(world_frame)) {
+      world_frame_(std::move(world_frame)),
+      logger_(node.get_logger()) {
   // Start the queue processing retry timer.
   // NOTE: node.get_clock() rather than create_wall_timer(). ROS1's
   //       nh.createTimer() respected /use_sim_time, and every dataset replay

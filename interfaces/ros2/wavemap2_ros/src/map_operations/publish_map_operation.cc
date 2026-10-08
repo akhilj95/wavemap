@@ -36,7 +36,8 @@ PublishMapOperation::PublishMapOperation(
       thread_pool_(std::move(thread_pool)),
       world_frame_(std::move(world_frame)),
       clock_(node.get_clock()),
-      last_run_timestamp_(0, 0, clock_->get_clock_type()) {
+      last_run_timestamp_(0, 0, clock_->get_clock_type()),
+      conversions_logger_(node.get_logger().get_child("conversions")) {
   // NOTE: Default QoS, i.e. reliable, matching ROS1's TCP transport. Map
   //       updates are incremental, so a dropped message would leave its blocks
   //       missing downstream until the next full retransmission.
@@ -84,7 +85,7 @@ void PublishMapOperation::publishMap(const rclcpp::Time& current_time,
     occupancy_map_->threshold();
     wavemap2_msgs::msg::Map map_msg;
     if (convert::mapToRosMsg(*occupancy_map_, world_frame_, current_time,
-                             map_msg)) {
+                             map_msg, conversions_logger_)) {
       map_pub_->publish(map_msg);
     }
   }

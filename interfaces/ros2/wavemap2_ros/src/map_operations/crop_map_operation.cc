@@ -4,7 +4,6 @@
 #include <string>
 #include <utility>
 
-#include <glog/logging.h>
 #include <wavemap/core/indexing/index_conversions.h>
 #include <wavemap/core/map/hashed_blocks.h>
 #include <wavemap/core/map/hashed_chunked_wavelet_octree.h>
@@ -35,7 +34,8 @@ CropMapOperation::CropMapOperation(const CropMapOperationConfig& config,
       transformer_(std::move(transformer)),
       world_frame_(std::move(world_frame)),
       clock_(node.get_clock()),
-      last_run_timestamp_(0, 0, clock_->get_clock_type()) {}
+      last_run_timestamp_(0, 0, clock_->get_clock_type()),
+      logger_(node.get_logger()) {}
 
 bool CropMapOperation::shouldRun(const rclcpp::Time& current_time) {
   return config_.once_every < (current_time - last_run_timestamp_).seconds();
@@ -56,11 +56,12 @@ void CropMapOperation::run(bool force_run) {
   const auto T_W_B = transformer_->lookupTransform(
       world_frame_, config_.body_frame, current_time);
   if (!T_W_B) {
-    LOG(WARNING) << "Could not look up center point for map cropping. TF "
-                    "lookup of body_frame \""
-                 << config_.body_frame << "\" w.r.t. world_frame \""
-                 << world_frame_ << "\" at time "
-                 << current_time.nanoseconds() << " failed.";
+    RCLCPP_WARN_STREAM(logger_,
+                       "Could not look up center point for map cropping. TF "
+                       "lookup of body_frame \""
+                           << config_.body_frame << "\" w.r.t. world_frame \""
+                           << world_frame_ << "\" at time "
+                           << current_time.nanoseconds() << " failed.");
     return;
   }
 
@@ -87,8 +88,9 @@ void CropMapOperation::run(bool force_run) {
              hashed_chunked_wavelet_octree) {
     hashed_chunked_wavelet_octree->eraseBlockIf(indicator_fn);
   } else {
-    LOG(WARNING)
-        << "Map cropping is only supported for hash-based map data structures.";
+    RCLCPP_WARN(
+        logger_,
+        "Map cropping is only supported for hash-based map data structures.");
   }
 }
 }  // namespace wavemap

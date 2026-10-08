@@ -45,8 +45,9 @@ int main(int argc, char** argv) {
   //       for this. The ROS2 launch file cannot make it required (included
   //       launch files only count explicitly passed required args).
   if (rosbag_paths_str.find_first_not_of(" \t\n") == std::string::npos) {
-    LOG(ERROR) << "ROS parameter \"rosbag_path\" is not set. It must list "
-                  "the rosbag(s) to process, separated by spaces.";
+    RCLCPP_ERROR(node->get_logger(),
+                 "ROS parameter \"rosbag_path\" is not set. It must list "
+                 "the rosbag(s) to process, separated by spaces.");
     return -1;
   }
 
@@ -64,10 +65,12 @@ int main(int argc, char** argv) {
             dynamic_cast<PointcloudTopicInput*>(input.get());
         pointcloud_input) {
       PointcloudTopicInput::registerCallback(
-          pointcloud_input->getTopicType(), [&](auto callback_ptr) {
+          pointcloud_input->getTopicType(),
+          [&](auto callback_ptr) {
             rosbag_processor.addCallback(input->getTopicName(), callback_ptr,
                                          pointcloud_input);
-          });
+          },
+          node->get_logger());
     } else if (auto depth_image_input =
                    dynamic_cast<DepthImageTopicInput*>(input.get());
                depth_image_input) {
@@ -75,12 +78,13 @@ int main(int argc, char** argv) {
           input->getTopicName(), &DepthImageTopicInput::callback,
           depth_image_input);
     } else {
-      LOG(WARNING) << "Failed to register callback for input number "
-                   << input_idx << ", with topic \"" << input->getTopicName()
-                   << "\". Support for inputs of type \""
-                   << input->getType().toStr()
-                   << "\" is not yet implemented in the rosbag processing "
-                      "script.";
+      RCLCPP_WARN_STREAM(
+          node->get_logger(),
+          "Failed to register callback for input number "
+              << input_idx << ", with topic \"" << input->getTopicName()
+              << "\". Support for inputs of type \"" << input->getType().toStr()
+              << "\" is not yet implemented in the rosbag processing "
+                 "script.");
     }
     // Drain this input's queue as soon as the messages feeding it have been
     // read, rather than waiting for its retry timer. See rosbag_processor.h.

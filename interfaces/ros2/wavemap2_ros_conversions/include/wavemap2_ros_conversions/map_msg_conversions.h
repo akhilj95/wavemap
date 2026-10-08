@@ -8,6 +8,7 @@
 #include <unordered_set>
 #include <utility>
 
+#include <rclcpp/logger.hpp>
 #include <rclcpp/time.hpp>
 #include <wavemap/core/map/hashed_blocks.h>
 #include <wavemap/core/map/hashed_chunked_wavelet_octree.h>
@@ -22,8 +23,12 @@
 // and wavemap_msgs::* -> wavemap2_msgs::msg::*.
 namespace wavemap::convert {
 bool mapToRosMsg(const MapBase& map, const std::string& frame_id,
-                 const rclcpp::Time& stamp, wavemap2_msgs::msg::Map& msg);
-bool rosMsgToMap(const wavemap2_msgs::msg::Map& msg, MapBase::Ptr& map);
+                 const rclcpp::Time& stamp, wavemap2_msgs::msg::Map& msg,
+                 const rclcpp::Logger& logger =
+                     rclcpp::get_logger("wavemap2_ros_conversions"));
+bool rosMsgToMap(const wavemap2_msgs::msg::Map& msg, MapBase::Ptr& map,
+                 const rclcpp::Logger& logger =
+                     rclcpp::get_logger("wavemap2_ros_conversions"));
 
 void mapToRosMsg(const HashedBlocks& map,
                  wavemap2_msgs::msg::HashedBlocks& msg);

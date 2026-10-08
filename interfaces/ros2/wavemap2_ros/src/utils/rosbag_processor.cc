@@ -17,12 +17,14 @@ void RosbagProcessor::addRosbag(const std::string& rosbag_path) {
   try {
     reader->open(rosbag_path);
   } catch (const std::exception& e) {
-    LOG(ERROR) << "Could not open rosbag " << rosbag_path << ": " << e.what();
+    RCLCPP_ERROR_STREAM(node_.get_logger(), "Could not open rosbag "
+                                                << rosbag_path << ": "
+                                                << e.what());
     return;
   }
   opened_rosbags_.emplace_back(std::move(reader));
   heads_.emplace_back(nullptr);
-  LOG(INFO) << "Loaded rosbag " << rosbag_path;
+  RCLCPP_INFO_STREAM(node_.get_logger(), "Loaded rosbag " << rosbag_path);
 }
 
 bool RosbagProcessor::addRosbags(std::istringstream& rosbag_paths) {

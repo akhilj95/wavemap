@@ -6,7 +6,6 @@
 #include <vector>
 
 #include <cv_bridge/cv_bridge.hpp>
-#include <glog/logging.h>
 #include <opencv2/core/eigen.hpp>
 #include <wavemap/core/integrator/projective/projective_integrator.h>
 #include <wavemap/core/utils/iterate/grid_iterator.h>
@@ -95,12 +94,14 @@ void DepthImageTopicInput::processQueue() {
         // Try to get this depth image's pose again at the next iteration
         return;
       } else {
-        LOG(WARNING) << "Waited " << config_.max_wait_for_pose
-                     << "s but still could not look up pose for depth image "
-                        "with frame \""
-                     << sensor_frame_id << "\" in world frame \""
-                     << world_frame_ << "\" at timestamp "
-                     << stamp.nanoseconds() << "; skipping depth image.";
+        RCLCPP_WARN_STREAM(
+            logger_,
+            "Waited " << config_.max_wait_for_pose
+                      << "s but still could not look up pose for depth image "
+                         "with frame \""
+                      << sensor_frame_id << "\" in world frame \""
+                      << world_frame_ << "\" at timestamp "
+                      << stamp.nanoseconds() << "; skipping depth image.");
         depth_image_queue_.pop();
         continue;
       }
@@ -121,18 +122,20 @@ void DepthImageTopicInput::processQueue() {
     posed_depth_image.setPose(*T_W_C);
 
     // Integrate the depth image
-    VLOG(1) << "Inserting depth image with "
-            << print::eigen::oneLine(posed_depth_image.getDimensions())
-            << " points. Remaining pointclouds in queue: "
-            << depth_image_queue_.size() - 1 << ".";
+    RCLCPP_DEBUG_STREAM(
+        logger_, "Inserting depth image with "
+                     << print::eigen::oneLine(posed_depth_image.getDimensions())
+                     << " points. Remaining pointclouds in queue: "
+                     << depth_image_queue_.size() - 1 << ".");
     integration_timer_.start();
     pipeline_->runPipeline(config_.measurement_integrator_names,
                            posed_depth_image);
     integration_timer_.stop();
-    VLOG(1) << "Integrated new depth image in "
-            << integration_timer_.getLastEpisodeDuration()
-            << "s. Total integration time: "
-            << integration_timer_.getTotalDuration() << "s.";
+    RCLCPP_DEBUG_STREAM(logger_,
+                        "Integrated new depth image in "
+                            << integration_timer_.getLastEpisodeDuration()
+                            << "s. Total integration time: "
+                            << integration_timer_.getTotalDuration() << "s.");
 
     // Publish debugging visualizations
     publishProjectedPointcloudIfEnabled(stamp, posed_depth_image);

@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include <glog/logging.h>
+#include <rclcpp/logging.hpp>
 #include <wavemap/core/utils/profile/profiler_interface.h>
 #include <wavemap/core/utils/undistortion/pointcloud_undistortion.h>
 
@@ -51,8 +51,8 @@ PointcloudUndistorter::Result PointcloudUndistorter::undistortPointcloud(
     if (pose) {
       pose_buffer.emplace_back(stamp, *pose);
     } else {
-      LOG(WARNING) << "Failed to buffer intermediate pose at time " << stamp
-                   << ".";
+      RCLCPP_WARN_STREAM(logger_, "Failed to buffer intermediate pose at time "
+                                      << stamp << ".");
       return Result::kIntermediateTimeNotInTfBuffer;
     }
   }

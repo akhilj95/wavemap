@@ -103,6 +103,7 @@ class RosServer {
   static param::Value loadParams(rclcpp::Node& node);
 
  private:
+  const rclcpp::Logger logger_;
   const RosServerConfig config_;
 
   // Map data structure

@@ -6,7 +6,6 @@
 #include <vector>
 
 #include <geometry_msgs/msg/point32.hpp>
-#include <glog/logging.h>
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <sensor_msgs/point_cloud2_iterator.hpp>
 #include <wavemap/core/utils/profile/profiler_interface.h>
@@ -55,23 +54,26 @@ PointcloudTopicInput::PointcloudTopicInput(
       config_(config.checkValid()),
       pointcloud_undistorter_(
           transformer,
-          config_.num_undistortion_interpolation_intervals_per_cloud) {
+          config_.num_undistortion_interpolation_intervals_per_cloud, logger_) {
   // Subscribe to the pointcloud input.
   // NOTE: SensorDataQoS (best effort) rather than the default Reliable. Most
   //       ROS2 sensor drivers publish best effort, and a Reliable subscriber
   //       silently never connects to one. The history depth comes from
   //       topic_queue_length, the same config field ROS1 used as its
   //       subscriber queue length.
-  registerCallback(config_.topic_type, [this, &node](auto callback_ptr) {
-    using MessageT =
-        decltype(detail::pointcloudCallbackMessageType(callback_ptr));
-    pointcloud_sub_ = node.create_subscription<MessageT>(
-        config_.topic_name,
-        rclcpp::SensorDataQoS().keep_last(config_.topic_queue_length),
-        [this, callback_ptr](const typename MessageT::ConstSharedPtr msg) {
-          std::invoke(callback_ptr, this, *msg);
-        });
-  });
+  registerCallback(
+      config_.topic_type,
+      [this, &node](auto callback_ptr) {
+        using MessageT =
+            decltype(detail::pointcloudCallbackMessageType(callback_ptr));
+        pointcloud_sub_ = node.create_subscription<MessageT>(
+            config_.topic_name,
+            rclcpp::SensorDataQoS().keep_last(config_.topic_queue_length),
+            [this, callback_ptr](const typename MessageT::ConstSharedPtr msg) {
+              std::invoke(callback_ptr, this, *msg);
+            });
+      },
+      logger_);
 
   // Advertise the range image and undistorted pointcloud publishers if enabled
   if (!config_.projected_range_image_topic_name.empty()) {
@@ -92,10 +94,11 @@ void PointcloudTopicInput::callback(
   // Skip empty clouds
   const size_t num_points = pointcloud_msg.height * pointcloud_msg.width;
   if (num_points == 0) {
-    LOG(WARNING)
-        << "Skipping empty pointcloud with timestamp "
-        << rclcpp::Time(pointcloud_msg.header.stamp, RCL_ROS_TIME).nanoseconds()
-        << ".";
+    RCLCPP_WARN_STREAM(
+        logger_, "Skipping empty pointcloud with timestamp "
+                     << rclcpp::Time(pointcloud_msg.header.stamp, RCL_ROS_TIME)
+                            .nanoseconds()
+                     << ".");
     return;
   }
 
@@ -106,13 +109,15 @@ void PointcloudTopicInput::callback(
                      return field.name == "x";
                    });
   if (x_field_iter == pointcloud_msg.fields.end()) {
-    LOG(WARNING) << "Received pointcloud with missing field x";
+    RCLCPP_WARN(logger_, "Received pointcloud with missing field x");
     return;
   } else if ((++x_field_iter)->name != "y") {
-    LOG(WARNING) << "Received pointcloud with missing or out-of-order field y";
+    RCLCPP_WARN(logger_,
+                "Received pointcloud with missing or out-of-order field y");
     return;
   } else if ((++x_field_iter)->name != "z") {
-    LOG(WARNING) << "Received pointcloud with missing or out-of-order field z";
+    RCLCPP_WARN(logger_,
+                "Received pointcloud with missing or out-of-order field z");
     return;
   }
 
@@ -146,17 +151,21 @@ void PointcloudTopicInput::callback(
           }
           loaded = true;
         } else {
-          LOG(WARNING) << "Pointcloud topic type is set to \""
-                       << config_.topic_type.toStr()
-                       << "\", but message has no time field \"t\". Will not "
-                          "be undistorted.";
+          RCLCPP_WARN_STREAM(
+              logger_,
+              "Pointcloud topic type is set to \""
+                  << config_.topic_type.toStr()
+                  << "\", but message has no time field \"t\". Will not "
+                     "be undistorted.");
         }
         break;
       default:
-        LOG(WARNING)
-            << "Pointcloud undistortion is enabled, but not yet supported for "
-               "topic type \""
-            << config_.topic_type.toStr() << "\". Will not be undistorted.";
+        RCLCPP_WARN_STREAM(
+            logger_,
+            "Pointcloud undistortion is enabled, but not yet supported for "
+            "topic type \""
+                << config_.topic_type.toStr()
+                << "\". Will not be undistorted.");
     }
   }
 
@@ -177,10 +186,11 @@ void PointcloudTopicInput::callback(
   ProfilerZoneScoped;
   // Skip empty clouds
   if (pointcloud_msg.points.empty()) {
-    LOG(WARNING)
-        << "Skipping empty pointcloud with timestamp "
-        << rclcpp::Time(pointcloud_msg.header.stamp, RCL_ROS_TIME).nanoseconds()
-        << ".";
+    RCLCPP_WARN_STREAM(
+        logger_, "Skipping empty pointcloud with timestamp "
+                     << rclcpp::Time(pointcloud_msg.header.stamp, RCL_ROS_TIME)
+                            .nanoseconds()
+                     << ".");
     return;
   }
 
@@ -211,13 +221,15 @@ void PointcloudTopicInput::processQueue() {
     if (config_.max_wait_for_pose <
         convert::nanoSecondsToSeconds(pointcloud_queue_.back().getEndTime() -
                                       oldest_msg.getStartTime())) {
-      LOG(WARNING) << "Max waiting time of " << config_.max_wait_for_pose
-                   << "s exceeded for pointcloud with frame \""
-                   << oldest_msg.getSensorFrame() << "\" and time interval ["
-                   << oldest_msg.getStartTime() << ", "
-                   << oldest_msg.getEndTime() << "] vs newest cloud end time "
-                   << pointcloud_queue_.back().getEndTime()
-                   << ". Dropping cloud.";
+      RCLCPP_WARN_STREAM(
+          logger_,
+          "Max waiting time of "
+              << config_.max_wait_for_pose
+              << "s exceeded for pointcloud with frame \""
+              << oldest_msg.getSensorFrame() << "\" and time interval ["
+              << oldest_msg.getStartTime() << ", " << oldest_msg.getEndTime()
+              << "] vs newest cloud end time "
+              << pointcloud_queue_.back().getEndTime() << ". Dropping cloud.");
       pointcloud_queue_.pop();
       continue;
     }
@@ -236,19 +248,22 @@ void PointcloudTopicInput::processQueue() {
             // Try to get this pointcloud's pose again at the next iteration
             return;
           case PointcloudUndistorter::Result::kStartTimeNotInTfBuffer:
-            LOG(WARNING)
-                << "Pointcloud end pose is available but start pose at time "
-                << start_time << " is not (or no longer). Skipping pointcloud.";
+            RCLCPP_WARN_STREAM(
+                logger_,
+                "Pointcloud end pose is available but start pose at time "
+                    << start_time
+                    << " is not (or no longer). Skipping pointcloud.");
             break;
           case PointcloudUndistorter::Result::kIntermediateTimeNotInTfBuffer:
-            LOG(WARNING)
-                << "Could not buffer all transforms for pointcloud spanning "
-                   "time interval ["
-                << start_time << ", " << end_time
-                << "]. This should never happen. Skipping pointcloud.";
+            RCLCPP_WARN_STREAM(
+                logger_,
+                "Could not buffer all transforms for pointcloud spanning "
+                "time interval ["
+                    << start_time << ", " << end_time
+                    << "]. This should never happen. Skipping pointcloud.");
             break;
           default:
-            LOG(WARNING) << "Unknown pointcloud undistortion error.";
+            RCLCPP_WARN(logger_, "Unknown pointcloud undistortion error.");
         }
 
         pointcloud_queue_.pop();
@@ -276,25 +291,29 @@ void PointcloudTopicInput::processQueue() {
 
     // Integrate the pointcloud
     // NOTE: timebase_ns is this cloud's own (bag/sim) timestamp, logged as a
-    //       raw integer (not seconds-as-double, which glog's default <<
+    //       raw integer (not seconds-as-double, which a stream's default
     //       precision rounds to ~6 significant digits -- not enough to tell
     //       sub-second timestamps apart) so the first few clouds of a run
     //       can be compared against ROS1's equivalent sim-time (ROS1 gets
-    //       this for free from rosconsole's [wall, sim] prefix; glog has no
-    //       sim-time concept, so it has to be logged explicitly here).
+    //       this for free from rosconsole's [wall, sim] prefix; ROS2's
+    //       console output only carries wall time, so it has to be logged
+    //       explicitly here).
     const uint64_t timebase_ns = oldest_msg.getTimeBase();
-    VLOG(1) << "Inserting pointcloud with " << posed_pointcloud.size()
-            << " points, timebase " << timebase_ns
-            << "ns. Remaining pointclouds in queue: "
-            << pointcloud_queue_.size() - 1 << ".";
+    RCLCPP_DEBUG_STREAM(logger_, "Inserting pointcloud with "
+                                     << posed_pointcloud.size()
+                                     << " points, timebase " << timebase_ns
+                                     << "ns. Remaining pointclouds in queue: "
+                                     << pointcloud_queue_.size() - 1 << ".");
     integration_timer_.start();
     pipeline_->runPipeline(config_.measurement_integrator_names,
                            posed_pointcloud);
     integration_timer_.stop();
-    VLOG(1) << "Integrated new pointcloud (timebase " << timebase_ns
-            << "ns) in " << integration_timer_.getLastEpisodeDuration()
-            << "s. Total integration time: "
-            << integration_timer_.getTotalDuration() << "s.";
+    RCLCPP_DEBUG_STREAM(logger_,
+                        "Integrated new pointcloud (timebase "
+                            << timebase_ns << "ns) in "
+                            << integration_timer_.getLastEpisodeDuration()
+                            << "s. Total integration time: "
+                            << integration_timer_.getTotalDuration() << "s.");
 
     // Publish debugging visualizations
     publishProjectedRangeImageIfEnabled(

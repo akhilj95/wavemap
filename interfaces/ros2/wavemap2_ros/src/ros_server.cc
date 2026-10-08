@@ -24,37 +24,44 @@ namespace {
 // The sections now come from one parsed file instead, but the
 // missing-section behaviour is kept identical so that a partial config
 // behaves the same on both interfaces.
-param::Value getSection(const param::Value& params, const std::string& name) {
+param::Value getSection(const param::Value& params, const std::string& name,
+                        const rclcpp::Logger& logger) {
   if (const auto child = params.getChild(name); child) {
     return child.value();
   }
-  LOG(WARNING) << "Could not load config section \"" << name << "\".";
+  RCLCPP_WARN_STREAM(logger,
+                     "Could not load config section \"" << name << "\".");
   return param::Value{param::Map{}};
 }
 
 param::Array getSectionAsArray(const param::Value& params,
-                               const std::string& name) {
+                               const std::string& name,
+                               const rclcpp::Logger& logger) {
   if (const auto child = params.getChild(name); child) {
     if (const auto array = child->as<param::Array>(); array) {
       return array.value();
     }
-    LOG(WARNING) << "Config section \"" << name << "\" is not a list.";
+    RCLCPP_WARN_STREAM(logger,
+                       "Config section \"" << name << "\" is not a list.");
     return {};
   }
-  LOG(WARNING) << "Could not load config section \"" << name << "\".";
+  RCLCPP_WARN_STREAM(logger,
+                     "Could not load config section \"" << name << "\".");
   return {};
 }
 
-param::Map getSectionAsMap(const param::Value& params,
-                           const std::string& name) {
+param::Map getSectionAsMap(const param::Value& params, const std::string& name,
+                           const rclcpp::Logger& logger) {
   if (const auto child = params.getChild(name); child) {
     if (const auto map = child->as<param::Map>(); map) {
       return map.value();
     }
-    LOG(WARNING) << "Config section \"" << name << "\" is not a map.";
+    RCLCPP_WARN_STREAM(logger,
+                       "Config section \"" << name << "\" is not a map.");
     return {};
   }
-  LOG(WARNING) << "Could not load config section \"" << name << "\".";
+  RCLCPP_WARN_STREAM(logger,
+                     "Could not load config section \"" << name << "\".");
   return {};
 }
 }  // namespace
@@ -84,17 +91,19 @@ param::Value RosServer::loadParams(rclcpp::Node& node) {
     const std::string message =
         std::string("ROS parameter \"") + kConfigFileParamName +
         "\" is not set. It must point at wavemap's YAML config file.";
-    LOG(ERROR) << message;
+    RCLCPP_ERROR_STREAM(node.get_logger(), message);
     throw std::runtime_error(message);
   }
 
-  const auto params = param::convert::yamlFileToParams(config_file);
+  const auto params = param::convert::yamlFileToParams(
+      config_file, node.get_logger().get_child("conversions"));
   if (!params) {
     // NOTE: yamlFileToParams already logged why.
     throw std::runtime_error("Could not load wavemap config file: " +
                              config_file);
   }
-  LOG(INFO) << "Loaded wavemap config from " << config_file;
+  RCLCPP_INFO_STREAM(node.get_logger(),
+                     "Loaded wavemap config from " << config_file);
   return params.value();
 }
 
@@ -107,13 +116,16 @@ RosServer::RosServer(rclcpp::Node& node,
 RosServer::RosServer(rclcpp::Node& node, const param::Value& params,
                      std::shared_ptr<TfTransformer> transformer)
     : RosServer(node, params,
-                RosServerConfig::from(getSection(params, "general")).value(),
+                RosServerConfig::from(
+                    getSection(params, "general", node.get_logger()))
+                    .value(),
                 std::move(transformer)) {}
 
 RosServer::RosServer(rclcpp::Node& node, const param::Value& params,
                      const RosServerConfig& config,
                      std::shared_ptr<TfTransformer> transformer)
-    : config_(config.checkValid()),
+    : logger_(node.get_logger()),
+      config_(config.checkValid()),
       transformer_(transformer ? std::move(transformer)
                                : std::make_shared<TfTransformer>(node)) {
   // Set the logging level for wavemap's C++ library (uses glog) and ROS
@@ -121,14 +133,14 @@ RosServer::RosServer(rclcpp::Node& node, const param::Value& params,
   config_.logging_level.applyToRosConsole(node.get_logger().get_name());
 
   // Setup data structure
-  const auto data_structure_params = getSection(params, "map");
+  const auto data_structure_params = getSection(params, "map", logger_);
   occupancy_map_ =
       MapFactory::create(data_structure_params, MapType::kHashedBlocks);
   CHECK_NOTNULL(occupancy_map_);
 
   // Setup thread pool
-  LOG(INFO) << "Creating thread pool with " << config_.num_threads
-            << " threads.";
+  RCLCPP_INFO_STREAM(logger_, "Creating thread pool with "
+                                  << config_.num_threads << " threads.");
   thread_pool_ = std::make_shared<ThreadPool>(config_.num_threads);
   CHECK_NOTNULL(thread_pool_);
 
@@ -138,21 +150,22 @@ RosServer::RosServer(rclcpp::Node& node, const param::Value& params,
 
   // Add map operations to pipeline
   const param::Array map_operation_param_array =
-      getSectionAsArray(params, "map_operations");
+      getSectionAsArray(params, "map_operations", logger_);
   for (const auto& operation_params : map_operation_param_array) {
     addOperation(operation_params, node);
   }
 
   // Add measurement integrators to pipeline
   const param::Map measurement_integrator_param_map =
-      getSectionAsMap(params, "measurement_integrators");
+      getSectionAsMap(params, "measurement_integrators", logger_);
   for (const auto& [integrator_name, integrator_params] :
        measurement_integrator_param_map) {
     pipeline_->addIntegrator(integrator_name, integrator_params);
   }
 
   // Setup measurement inputs
-  const param::Array input_param_array = getSectionAsArray(params, "inputs");
+  const param::Array input_param_array =
+      getSectionAsArray(params, "inputs", logger_);
   for (const auto& integrator_params : input_param_array) {
     addInput(integrator_params, node);
   }
@@ -183,7 +196,7 @@ RosInputBase* RosServer::addInput(std::unique_ptr<RosInputBase> input) {
     return inputs_.emplace_back(std::move(input)).get();
   }
 
-  LOG(WARNING) << "Ignoring request to add input. Input is null pointer.";
+  RCLCPP_WARN(logger_, "Ignoring request to add input. Input is null pointer.");
   return nullptr;
 }
 
@@ -194,9 +207,10 @@ MapOperationBase* RosServer::addOperation(const param::Value& operation_params,
   if (!type_name) {
     // No type name was defined
     // NOTE: A message explaining the failure is already printed by getTypeStr.
-    LOG(WARNING) << "Could not add operation. No operation type specified. "
-                    "Please set it by adding a param with key \""
-                 << param::kTypeSelectorKey << "\".";
+    RCLCPP_WARN_STREAM(logger_,
+                       "Could not add operation. No operation type specified. "
+                       "Please set it by adding a param with key \""
+                           << param::kTypeSelectorKey << "\".");
     return nullptr;
   }
 
@@ -228,7 +242,8 @@ bool RosServer::saveMap(const std::filesystem::path& file_path) const {
     occupancy_map_->threshold();
     return io::mapToFile(*occupancy_map_, file_path);
   } else {
-    LOG(ERROR) << "Could not save map because it has not yet been allocated.";
+    RCLCPP_ERROR(logger_,
+                 "Could not save map because it has not yet been allocated.");
   }
   return false;
 }
@@ -255,15 +270,16 @@ void RosServer::advertiseServices(rclcpp::Node& node) {
           if (occupancy_map_) {
             occupancy_map_->clear();
           }
-          LOG(INFO) << "Map reset request was successfully executed.";
+          RCLCPP_INFO(logger_, "Map reset request was successfully executed.");
           response->success = true;
         } else {
           response->message =
               "Map resetting is forbidden. To change this, set ROS param \"" +
               NAMEOF(config_.allow_reset_map_service) + "\" to true.";
-          LOG(INFO) << "Received map reset request but ROS param \""
-                    << NAMEOF(config_.allow_reset_map_service)
-                    << "\" is set to false. Ignoring request.";
+          RCLCPP_INFO_STREAM(logger_,
+                             "Received map reset request but ROS param \""
+                                 << NAMEOF(config_.allow_reset_map_service)
+                                 << "\" is set to false. Ignoring request.");
         }
       });
 

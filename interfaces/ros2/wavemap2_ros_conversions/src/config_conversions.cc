@@ -5,7 +5,7 @@
 #include <regex>
 #include <string>
 
-#include <glog/logging.h>
+#include <rclcpp/logging.hpp>
 
 namespace wavemap::param::convert {
 namespace {
@@ -44,7 +44,8 @@ const std::regex kFloatPattern{
     "|[-+]?\\.(?:inf|Inf|INF)"                     // .inf
     "|\\.(?:nan|NaN|NAN))$"};                      // .nan
 
-param::Value scalarToParamValue(const YAML::Node& node) {
+param::Value scalarToParamValue(const YAML::Node& node,
+                                const rclcpp::Logger& logger) {
   const std::string& scalar = node.Scalar();
 
   // A quoted scalar is always a string, whatever it looks like. yaml-cpp
@@ -79,9 +80,10 @@ param::Value scalarToParamValue(const YAML::Node& node) {
     }
   }
   if (std::regex_match(scalar, kNullPattern)) {
-    LOG(WARNING) << "Encountered a null value while parsing YAML config. "
-                    "wavemap's param type has no null, so it is read as an "
-                    "empty string.";
+    RCLCPP_WARN(logger,
+                "Encountered a null value while parsing YAML config. "
+                "wavemap's param type has no null, so it is read as an "
+                "empty string.");
     return param::Value{std::string{}};
   }
 
@@ -89,49 +91,54 @@ param::Value scalarToParamValue(const YAML::Node& node) {
 }
 }  // namespace
 
-param::Map toParamMap(const YAML::Node& node) {  // NOLINT
+param::Map toParamMap(const YAML::Node& node,  // NOLINT
+                      const rclcpp::Logger& logger) {
   if (!node.IsMap()) {
-    LOG(WARNING) << "Expected param map.";
+    RCLCPP_WARN(logger, "Expected param map.");
     return {};
   }
 
   param::Map param_map;
   for (const auto& kv : node) {
-    param_map.emplace(kv.first.Scalar(), toParamValue(kv.second));
+    param_map.emplace(kv.first.Scalar(), toParamValue(kv.second, logger));
   }
   return param_map;
 }
 
-param::Array toParamArray(const YAML::Node& node) {  // NOLINT
+param::Array toParamArray(const YAML::Node& node,  // NOLINT
+                          const rclcpp::Logger& logger) {
   if (!node.IsSequence()) {
-    LOG(WARNING) << "Expected param array.";
+    RCLCPP_WARN(logger, "Expected param array.");
     return {};
   }
 
   param::Array array;
   array.reserve(node.size());
   for (const auto& element : node) {
-    array.emplace_back(toParamValue(element));
+    array.emplace_back(toParamValue(element, logger));
   }
   return array;
 }
 
-param::Value toParamValue(const YAML::Node& node) {  // NOLINT
+param::Value toParamValue(const YAML::Node& node,  // NOLINT
+                          const rclcpp::Logger& logger) {
   switch (node.Type()) {
     case YAML::NodeType::Map:
-      return param::Value{toParamMap(node)};
+      return param::Value{toParamMap(node, logger)};
     case YAML::NodeType::Sequence:
-      return param::Value{toParamArray(node)};
+      return param::Value{toParamArray(node, logger)};
     case YAML::NodeType::Scalar:
-      return scalarToParamValue(node);
+      return scalarToParamValue(node, logger);
     case YAML::NodeType::Null:
-      LOG(WARNING) << "Encountered a null value while parsing YAML config. "
-                      "wavemap's param type has no null, so it is read as an "
-                      "empty string.";
+      RCLCPP_WARN(logger,
+                  "Encountered a null value while parsing YAML config. "
+                  "wavemap's param type has no null, so it is read as an "
+                  "empty string.");
       return param::Value{std::string{}};
     case YAML::NodeType::Undefined:
     default:
-      LOG(ERROR) << "Encountered undefined node while parsing YAML config.";
+      RCLCPP_ERROR(logger,
+                   "Encountered undefined node while parsing YAML config.");
       break;
   }
 
@@ -139,28 +146,29 @@ param::Value toParamValue(const YAML::Node& node) {  // NOLINT
   return param::Value{param::Array{}};
 }
 
-std::optional<param::Value> yamlStringToParams(const std::string& yaml) {
+std::optional<param::Value> yamlStringToParams(const std::string& yaml,
+                                               const rclcpp::Logger& logger) {
   try {
-    return toParamValue(YAML::Load(yaml));
+    return toParamValue(YAML::Load(yaml), logger);
   } catch (const YAML::Exception& e) {
-    LOG(ERROR) << "Failed to parse YAML config: " << e.what();
+    RCLCPP_ERROR_STREAM(logger, "Failed to parse YAML config: " << e.what());
     return std::nullopt;
   }
 }
 
 std::optional<param::Value> yamlFileToParams(
-    const std::filesystem::path& file_path) {
+    const std::filesystem::path& file_path, const rclcpp::Logger& logger) {
   std::error_code error_code;
   if (!std::filesystem::is_regular_file(file_path, error_code)) {
-    LOG(ERROR) << "Config file does not exist: " << file_path;
+    RCLCPP_ERROR_STREAM(logger, "Config file does not exist: " << file_path);
     return std::nullopt;
   }
 
   try {
-    return toParamValue(YAML::LoadFile(file_path.string()));
+    return toParamValue(YAML::LoadFile(file_path.string()), logger);
   } catch (const YAML::Exception& e) {
-    LOG(ERROR) << "Failed to parse config file " << file_path << ": "
-               << e.what();
+    RCLCPP_ERROR_STREAM(logger, "Failed to parse config file "
+                                    << file_path << ": " << e.what());
     return std::nullopt;
   }
 }

@@ -7,11 +7,13 @@
 #include <unordered_set>
 
 #include <glog/logging.h>
+#include <rclcpp/logging.hpp>
 #include <wavemap/core/utils/profile/profiler_interface.h>
 
 namespace wavemap::convert {
 bool mapToRosMsg(const MapBase& map, const std::string& frame_id,
-                 const rclcpp::Time& stamp, wavemap2_msgs::msg::Map& msg) {
+                 const rclcpp::Time& stamp, wavemap2_msgs::msg::Map& msg,
+                 const rclcpp::Logger& logger) {
   // Write the msg header
   msg.header.stamp = stamp;
   msg.header.frame_id = frame_id;
@@ -42,12 +44,14 @@ bool mapToRosMsg(const MapBase& map, const std::string& frame_id,
     return true;
   }
 
-  LOG(WARNING) << "Could not serialize requested map to ROS msg. "
-                 "Map type not yet supported.";
+  RCLCPP_WARN(logger,
+              "Could not serialize requested map to ROS msg. "
+              "Map type not yet supported.");
   return false;
 }
 
-bool rosMsgToMap(const wavemap2_msgs::msg::Map& msg, MapBase::Ptr& map) {
+bool rosMsgToMap(const wavemap2_msgs::msg::Map& msg, MapBase::Ptr& map,
+                 const rclcpp::Logger& logger) {
   ProfilerZoneScoped;
   // Check validity
   bool is_valid = true;
@@ -72,7 +76,7 @@ bool rosMsgToMap(const wavemap2_msgs::msg::Map& msg, MapBase::Ptr& map) {
     is_valid = false;
   }
   if (!is_valid) {
-    LOG(WARNING) << error_msg << "Ignoring.";
+    RCLCPP_WARN_STREAM(logger, error_msg << "Ignoring.");
     map = nullptr;
     return false;
   }
@@ -98,8 +102,9 @@ bool rosMsgToMap(const wavemap2_msgs::msg::Map& msg, MapBase::Ptr& map) {
     return true;
   }
 
-  LOG(WARNING) << "Conversion of the requested map ROS msg to a wavemap map "
-                 "is not yet supported.";
+  RCLCPP_WARN(logger,
+              "Conversion of the requested map ROS msg to a wavemap map "
+              "is not yet supported.");
   map = nullptr;
   return false;
 }

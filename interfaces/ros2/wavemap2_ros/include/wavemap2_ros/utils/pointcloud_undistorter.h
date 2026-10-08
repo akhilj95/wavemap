@@ -5,6 +5,7 @@
 #include <string>
 #include <utility>
 
+#include <rclcpp/logger.hpp>
 #include <wavemap/core/common.h>
 #include <wavemap/core/data_structure/pointcloud.h>
 #include <wavemap/core/utils/undistortion/stamped_pointcloud.h>
@@ -25,11 +26,13 @@ class PointcloudUndistorter {
     kSuccess
   };
 
-  explicit PointcloudUndistorter(std::shared_ptr<TfTransformer> transformer,
-                                 int num_interpolation_intervals_per_cloud)
+  PointcloudUndistorter(std::shared_ptr<TfTransformer> transformer,
+                        int num_interpolation_intervals_per_cloud,
+                        rclcpp::Logger logger)
       : transformer_(std::move(transformer)),
         num_interpolation_intervals_per_cloud_(
-            num_interpolation_intervals_per_cloud) {}
+            num_interpolation_intervals_per_cloud),
+        logger_(std::move(logger)) {}
 
   Result undistortPointcloud(
       undistortion::StampedPointcloud& stamped_pointcloud,
@@ -39,6 +42,7 @@ class PointcloudUndistorter {
  private:
   std::shared_ptr<TfTransformer> transformer_;
   const int num_interpolation_intervals_per_cloud_;
+  const rclcpp::Logger logger_;
 };
 }  // namespace wavemap
 

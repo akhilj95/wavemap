@@ -1,8 +1,6 @@
 #ifndef WAVEMAP_ROS_ROS2_INPUTS_IMPL_POINTCLOUD_TOPIC_INPUT_IMPL_H_
 #define WAVEMAP_ROS_ROS2_INPUTS_IMPL_POINTCLOUD_TOPIC_INPUT_IMPL_H_
 
-#include <glog/logging.h>
-
 namespace wavemap {
 namespace detail {
 // Recovers the message type from a PointcloudTopicInput::callback overload's
@@ -20,7 +18,8 @@ MessageT pointcloudCallbackMessageType(void (ClassT::*)(const MessageT&));
 
 template <typename RegistrarT>
 bool PointcloudTopicInput::registerCallback(PointcloudTopicType type,
-                                            RegistrarT registrar) {
+                                            RegistrarT registrar,
+                                            const rclcpp::Logger& logger) {
   switch (type) {
     case PointcloudTopicType::kPointCloud2:
     case PointcloudTopicType::kOuster:
@@ -39,15 +38,17 @@ bool PointcloudTopicInput::registerCallback(PointcloudTopicType type,
       // clang-format on
       return true;
 #else
-      LOG(ERROR) << "Livox support is currently not available. Please install "
-                    "livox_ros_driver2 and rebuild wavemap.";
+      RCLCPP_ERROR(logger,
+                   "Livox support is currently not available. Please install "
+                   "livox_ros_driver2 and rebuild wavemap.");
       return false;
 #endif
     default:
-      LOG(ERROR)
-          << "Requested callback registration for unknown PointcloudTopicType "
-             "\""
-          << type.toStr() << "\"";
+      RCLCPP_ERROR_STREAM(
+          logger,
+          "Requested callback registration for unknown PointcloudTopicType "
+          "\"" << type.toStr()
+               << "\"");
       return false;
   }
 }

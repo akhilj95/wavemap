@@ -106,7 +106,8 @@ class PointcloudTopicInput : public RosInputBase {
 #endif
 
   template <typename RegistrarT>
-  static bool registerCallback(PointcloudTopicType type, RegistrarT registrar);
+  static bool registerCallback(PointcloudTopicType type, RegistrarT registrar,
+                               const rclcpp::Logger& logger);
 
  private:
   const PointcloudTopicInputConfig config_;

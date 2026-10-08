@@ -29,7 +29,8 @@ std::unique_ptr<RosInputBase> RosInputFactory::create(
     std::shared_ptr<TfTransformer> transformer, std::string world_frame,
     rclcpp::Node& node) {
   if (!input_type.isValid()) {
-    LOG(ERROR) << "Received request to create input handler with invalid type.";
+    RCLCPP_ERROR(node.get_logger(),
+                 "Received request to create input handler with invalid type.");
     return nullptr;
   }
 
@@ -42,7 +43,8 @@ std::unique_ptr<RosInputBase> RosInputFactory::create(
             config.value(), std::move(pipeline), std::move(transformer),
             std::move(world_frame), node);
       } else {
-        LOG(ERROR) << "Pointcloud input handler config could not be loaded.";
+        RCLCPP_ERROR(node.get_logger(),
+                     "Pointcloud input handler config could not be loaded.");
         return nullptr;
       }
     case RosInputType::kDepthImageTopic:
@@ -52,13 +54,15 @@ std::unique_ptr<RosInputBase> RosInputFactory::create(
             config.value(), std::move(pipeline), std::move(transformer),
             std::move(world_frame), node);
       } else {
-        LOG(ERROR) << "Depth image input handler config could not be loaded.";
+        RCLCPP_ERROR(node.get_logger(),
+                     "Depth image input handler config could not be loaded.");
         return nullptr;
       }
   }
 
-  LOG(ERROR) << "Factory does not support creation of input type "
-             << input_type.toStr() << ".";
+  RCLCPP_ERROR_STREAM(node.get_logger(),
+                      "Factory does not support creation of input type "
+                          << input_type.toStr() << ".");
   return nullptr;
 }
 }  // namespace wavemap
