@@ -1,5 +1,5 @@
-#ifndef WAVEMAP_ROS_ROS2_ROS_SERVER_H_
-#define WAVEMAP_ROS_ROS2_ROS_SERVER_H_
+#ifndef WAVEMAP2_ROS_ROS_SERVER_H_
+#define WAVEMAP2_ROS_ROS_SERVER_H_
 
 #include <algorithm>
 #include <filesystem>
@@ -127,4 +127,4 @@ class RosServer {
 };
 }  // namespace wavemap
 
-#endif  // WAVEMAP_ROS_ROS2_ROS_SERVER_H_
+#endif  // WAVEMAP2_ROS_ROS_SERVER_H_

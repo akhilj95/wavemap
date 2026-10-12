@@ -9,10 +9,10 @@
 #include <wavemap/io/file_conversions.h>
 #include <wavemap/pipeline/map_operations/map_operation_factory.h>
 
-#include "wavemap2_ros_conversions/config_conversions.h"
 #include "wavemap2_ros/inputs/ros_input_factory.h"
 #include "wavemap2_ros/map_operations/map_ros_operation_factory.h"
 #include "wavemap2_ros/utils/private_name.h"
+#include "wavemap2_ros_conversions/config_conversions.h"
 
 namespace wavemap {
 namespace {

@@ -1,5 +1,5 @@
-#ifndef WAVEMAP_RVIZ_PLUGIN_ROS2_VISUALS_CELL_LAYER_H_
-#define WAVEMAP_RVIZ_PLUGIN_ROS2_VISUALS_CELL_LAYER_H_
+#ifndef WAVEMAP2_RVIZ_PLUGIN_VISUALS_CELL_LAYER_H_
+#define WAVEMAP2_RVIZ_PLUGIN_VISUALS_CELL_LAYER_H_
 
 #include <memory>
 #include <string>
@@ -111,4 +111,4 @@ class CellLayerRenderable : public Ogre::SimpleRenderable {
 };
 }  // namespace wavemap
 
-#endif  // WAVEMAP_RVIZ_PLUGIN_ROS2_VISUALS_CELL_LAYER_H_
+#endif  // WAVEMAP2_RVIZ_PLUGIN_VISUALS_CELL_LAYER_H_

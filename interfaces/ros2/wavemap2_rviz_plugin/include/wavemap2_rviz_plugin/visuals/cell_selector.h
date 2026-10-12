@@ -1,5 +1,5 @@
-#ifndef WAVEMAP_RVIZ_PLUGIN_ROS2_VISUALS_CELL_SELECTOR_H_
-#define WAVEMAP_RVIZ_PLUGIN_ROS2_VISUALS_CELL_SELECTOR_H_
+#ifndef WAVEMAP2_RVIZ_PLUGIN_VISUALS_CELL_SELECTOR_H_
+#define WAVEMAP2_RVIZ_PLUGIN_VISUALS_CELL_SELECTOR_H_
 
 #ifndef Q_MOC_RUN
 #include <rviz_common/logging.hpp>
@@ -63,4 +63,4 @@ class CellSelector : public QObject {
 };
 }  // namespace wavemap::rviz_plugin
 
-#endif  // WAVEMAP_RVIZ_PLUGIN_ROS2_VISUALS_CELL_SELECTOR_H_
+#endif  // WAVEMAP2_RVIZ_PLUGIN_VISUALS_CELL_SELECTOR_H_

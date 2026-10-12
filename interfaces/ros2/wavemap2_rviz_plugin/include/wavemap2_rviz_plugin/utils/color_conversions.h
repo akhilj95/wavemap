@@ -1,5 +1,5 @@
-#ifndef WAVEMAP_RVIZ_PLUGIN_ROS2_UTILS_COLOR_CONVERSIONS_H_
-#define WAVEMAP_RVIZ_PLUGIN_ROS2_UTILS_COLOR_CONVERSIONS_H_
+#ifndef WAVEMAP2_RVIZ_PLUGIN_UTILS_COLOR_CONVERSIONS_H_
+#define WAVEMAP2_RVIZ_PLUGIN_UTILS_COLOR_CONVERSIONS_H_
 
 #include <OgreColourValue.h>
 #include <wavemap/core/common.h>
@@ -39,4 +39,4 @@ inline Ogre::ColourValue scalarToColor(FloatingPoint value,
 }
 }  // namespace wavemap::rviz_plugin
 
-#endif  // WAVEMAP_RVIZ_PLUGIN_ROS2_UTILS_COLOR_CONVERSIONS_H_
+#endif  // WAVEMAP2_RVIZ_PLUGIN_UTILS_COLOR_CONVERSIONS_H_

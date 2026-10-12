@@ -1,5 +1,5 @@
-#ifndef WAVEMAP_ROS_ROS2_UTILS_TF_TRANSFORMER_H_
-#define WAVEMAP_ROS_ROS2_UTILS_TF_TRANSFORMER_H_
+#ifndef WAVEMAP2_ROS_UTILS_TF_TRANSFORMER_H_
+#define WAVEMAP2_ROS_UTILS_TF_TRANSFORMER_H_
 
 #include <chrono>
 #include <memory>
@@ -79,4 +79,4 @@ class TfTransformer {
 };
 }  // namespace wavemap
 
-#endif  // WAVEMAP_ROS_ROS2_UTILS_TF_TRANSFORMER_H_
+#endif  // WAVEMAP2_ROS_UTILS_TF_TRANSFORMER_H_

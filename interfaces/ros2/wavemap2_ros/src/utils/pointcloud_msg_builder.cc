@@ -17,9 +17,10 @@ sensor_msgs::msg::PointCloud2 toPointCloud2Msg(
   //       is not: it pads point_step out to 16 bytes, whereas ROS1's
   //       conversion produced a tightly packed 12. Verified by diffing the
   //       two messages, not assumed.
-  modifier.setPointCloud2Fields(3, "x", 1, sensor_msgs::msg::PointField::FLOAT32,
-                                "y", 1, sensor_msgs::msg::PointField::FLOAT32,
-                                "z", 1, sensor_msgs::msg::PointField::FLOAT32);
+  modifier.setPointCloud2Fields(3, "x", 1,
+                                sensor_msgs::msg::PointField::FLOAT32, "y", 1,
+                                sensor_msgs::msg::PointField::FLOAT32, "z", 1,
+                                sensor_msgs::msg::PointField::FLOAT32);
   modifier.resize(points.size());
   // NOTE: resize() sets height to 1, width to the point count and row_step
   //       accordingly. is_bigendian and is_dense keep their default-

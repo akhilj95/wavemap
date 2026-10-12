@@ -69,7 +69,8 @@ TYPED_TEST(MapMsgConversionsTest, MetadataPreservation) {
 
   // Check the header
   EXPECT_EQ(map_msg.header.frame_id, TestFixture::frame_id);
-  EXPECT_EQ(rclcpp::Time(map_msg.header.stamp, RCL_ROS_TIME), TestFixture::stamp);
+  EXPECT_EQ(rclcpp::Time(map_msg.header.stamp, RCL_ROS_TIME),
+            TestFixture::stamp);
 
   // TODO(victorr): Add option to deserialize into hashed chunked wavelet
   //                octrees, instead of implicitly converting them to regular

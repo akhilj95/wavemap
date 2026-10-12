@@ -1,5 +1,5 @@
-#ifndef WAVEMAP_ROS_ROS2_UTILS_ROS_LOGGING_LEVEL_H_
-#define WAVEMAP_ROS_ROS2_UTILS_ROS_LOGGING_LEVEL_H_
+#ifndef WAVEMAP2_ROS_UTILS_ROS_LOGGING_LEVEL_H_
+#define WAVEMAP2_ROS_UTILS_ROS_LOGGING_LEVEL_H_
 
 #include <array>
 #include <string>
@@ -40,4 +40,4 @@ struct RosLoggingLevel : public TypeSelector<RosLoggingLevel> {
 };
 }  // namespace wavemap
 
-#endif  // WAVEMAP_ROS_ROS2_UTILS_ROS_LOGGING_LEVEL_H_
+#endif  // WAVEMAP2_ROS_UTILS_ROS_LOGGING_LEVEL_H_

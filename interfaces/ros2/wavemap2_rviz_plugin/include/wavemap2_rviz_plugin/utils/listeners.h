@@ -1,5 +1,5 @@
-#ifndef WAVEMAP_RVIZ_PLUGIN_ROS2_UTILS_LISTENERS_H_
-#define WAVEMAP_RVIZ_PLUGIN_ROS2_UTILS_LISTENERS_H_
+#ifndef WAVEMAP2_RVIZ_PLUGIN_UTILS_LISTENERS_H_
+#define WAVEMAP2_RVIZ_PLUGIN_UTILS_LISTENERS_H_
 
 #include <memory>
 #include <utility>
@@ -52,4 +52,4 @@ class ViewportPrerenderListener {
 };
 }  // namespace wavemap::rviz_plugin
 
-#endif  // WAVEMAP_RVIZ_PLUGIN_ROS2_UTILS_LISTENERS_H_
+#endif  // WAVEMAP2_RVIZ_PLUGIN_UTILS_LISTENERS_H_

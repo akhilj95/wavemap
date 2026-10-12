@@ -1,5 +1,5 @@
-#ifndef WAVEMAP_RVIZ_PLUGIN_ROS2_COMMON_H_
-#define WAVEMAP_RVIZ_PLUGIN_ROS2_COMMON_H_
+#ifndef WAVEMAP2_RVIZ_PLUGIN_COMMON_H_
+#define WAVEMAP2_RVIZ_PLUGIN_COMMON_H_
 
 #include <mutex>
 
@@ -12,4 +12,4 @@ struct MapAndMutex {
 };
 }  // namespace wavemap::rviz_plugin
 
-#endif  // WAVEMAP_RVIZ_PLUGIN_ROS2_COMMON_H_
+#endif  // WAVEMAP2_RVIZ_PLUGIN_COMMON_H_

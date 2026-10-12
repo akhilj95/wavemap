@@ -8,8 +8,8 @@
 #include <wavemap/core/utils/profile/profiler_interface.h>
 #include <wavemap2_msgs/msg/map.hpp>
 
-#include "wavemap2_ros_conversions/map_msg_conversions.h"
 #include "wavemap2_ros/utils/private_name.h"
+#include "wavemap2_ros_conversions/map_msg_conversions.h"
 
 namespace wavemap {
 DECLARE_CONFIG_MEMBERS(PublishMapOperationConfig,

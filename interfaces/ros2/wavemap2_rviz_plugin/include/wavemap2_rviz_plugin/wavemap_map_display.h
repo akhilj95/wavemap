@@ -1,5 +1,5 @@
-#ifndef WAVEMAP_RVIZ_PLUGIN_ROS2_WAVEMAP_MAP_DISPLAY_H_
-#define WAVEMAP_RVIZ_PLUGIN_ROS2_WAVEMAP_MAP_DISPLAY_H_
+#ifndef WAVEMAP2_RVIZ_PLUGIN_WAVEMAP_MAP_DISPLAY_H_
+#define WAVEMAP2_RVIZ_PLUGIN_WAVEMAP_MAP_DISPLAY_H_
 
 #ifndef Q_MOC_RUN
 #include <chrono>
@@ -68,8 +68,7 @@ class WavemapMapDisplay
   void updateVisuals(bool redraw_all = false);
 
   // Function to handle an incoming ROS message
-  void processMessage(
-      wavemap2_msgs::msg::Map::ConstSharedPtr map_msg) override;
+  void processMessage(wavemap2_msgs::msg::Map::ConstSharedPtr map_msg) override;
 
   // Storage and message parsers for the map
   const std::shared_ptr<MapAndMutex> map_and_mutex_ =
@@ -146,4 +145,4 @@ class WavemapMapDisplay
 };
 }  // namespace wavemap::rviz_plugin
 
-#endif  // WAVEMAP_RVIZ_PLUGIN_ROS2_WAVEMAP_MAP_DISPLAY_H_
+#endif  // WAVEMAP2_RVIZ_PLUGIN_WAVEMAP_MAP_DISPLAY_H_

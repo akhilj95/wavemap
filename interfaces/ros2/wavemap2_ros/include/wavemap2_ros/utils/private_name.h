@@ -1,5 +1,5 @@
-#ifndef WAVEMAP_ROS_ROS2_UTILS_PRIVATE_NAME_H_
-#define WAVEMAP_ROS_ROS2_UTILS_PRIVATE_NAME_H_
+#ifndef WAVEMAP2_ROS_UTILS_PRIVATE_NAME_H_
+#define WAVEMAP2_ROS_UTILS_PRIVATE_NAME_H_
 
 #include <string>
 
@@ -22,4 +22,4 @@ inline std::string privateName(const std::string& name) {
 }
 }  // namespace wavemap
 
-#endif  // WAVEMAP_ROS_ROS2_UTILS_PRIVATE_NAME_H_
+#endif  // WAVEMAP2_ROS_UTILS_PRIVATE_NAME_H_

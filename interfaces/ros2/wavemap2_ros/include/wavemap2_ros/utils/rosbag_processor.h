@@ -1,5 +1,5 @@
-#ifndef WAVEMAP_ROS_ROS2_UTILS_ROSBAG_PROCESSOR_H_
-#define WAVEMAP_ROS_ROS2_UTILS_ROSBAG_PROCESSOR_H_
+#ifndef WAVEMAP2_ROS_UTILS_ROSBAG_PROCESSOR_H_
+#define WAVEMAP2_ROS_UTILS_ROSBAG_PROCESSOR_H_
 
 #include <functional>
 #include <map>
@@ -113,4 +113,4 @@ class RosbagProcessor {
 
 #include "wavemap2_ros/utils/impl/rosbag_processor_inl.h"
 
-#endif  // WAVEMAP_ROS_ROS2_UTILS_ROSBAG_PROCESSOR_H_
+#endif  // WAVEMAP2_ROS_UTILS_ROSBAG_PROCESSOR_H_

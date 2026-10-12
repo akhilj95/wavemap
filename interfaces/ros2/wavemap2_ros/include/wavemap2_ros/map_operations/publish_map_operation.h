@@ -1,5 +1,5 @@
-#ifndef WAVEMAP_ROS_ROS2_MAP_OPERATIONS_PUBLISH_MAP_OPERATION_H_
-#define WAVEMAP_ROS_ROS2_MAP_OPERATIONS_PUBLISH_MAP_OPERATION_H_
+#ifndef WAVEMAP2_ROS_MAP_OPERATIONS_PUBLISH_MAP_OPERATION_H_
+#define WAVEMAP2_ROS_MAP_OPERATIONS_PUBLISH_MAP_OPERATION_H_
 
 #include <memory>
 #include <string>
@@ -88,4 +88,4 @@ class PublishMapOperation : public MapOperationBase {
 
 #include "wavemap2_ros/map_operations/impl/publish_map_operation_inl.h"
 
-#endif  // WAVEMAP_ROS_ROS2_MAP_OPERATIONS_PUBLISH_MAP_OPERATION_H_
+#endif  // WAVEMAP2_ROS_MAP_OPERATIONS_PUBLISH_MAP_OPERATION_H_

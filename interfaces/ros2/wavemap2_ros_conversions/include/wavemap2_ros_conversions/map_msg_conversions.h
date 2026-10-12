@@ -1,5 +1,5 @@
-#ifndef WAVEMAP_ROS_CONVERSIONS_ROS2_MAP_MSG_CONVERSIONS_H_
-#define WAVEMAP_ROS_CONVERSIONS_ROS2_MAP_MSG_CONVERSIONS_H_
+#ifndef WAVEMAP2_ROS_CONVERSIONS_MAP_MSG_CONVERSIONS_H_
+#define WAVEMAP2_ROS_CONVERSIONS_MAP_MSG_CONVERSIONS_H_
 
 #include <algorithm>
 #include <memory>
@@ -63,4 +63,4 @@ void blockToRosMsg(const HashedChunkedWaveletOctree::BlockIndex& block_index,
                    wavemap2_msgs::msg::HashedWaveletOctreeBlock& msg);
 }  // namespace wavemap::convert
 
-#endif  // WAVEMAP_ROS_CONVERSIONS_ROS2_MAP_MSG_CONVERSIONS_H_
+#endif  // WAVEMAP2_ROS_CONVERSIONS_MAP_MSG_CONVERSIONS_H_

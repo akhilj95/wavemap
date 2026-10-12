@@ -109,7 +109,8 @@ bool rosMsgToMap(const wavemap2_msgs::msg::Map& msg, MapBase::Ptr& map,
   return false;
 }
 
-void mapToRosMsg(const HashedBlocks& map, wavemap2_msgs::msg::HashedBlocks& msg) {
+void mapToRosMsg(const HashedBlocks& map,
+                 wavemap2_msgs::msg::HashedBlocks& msg) {
   ProfilerZoneScoped;
   // Serialize the map and data structure's metadata
   msg.min_cell_width = map.getMinCellWidth();
@@ -184,7 +185,8 @@ void rosMsgToMap(const wavemap2_msgs::msg::HashedBlocks& msg,
   }
 }
 
-void mapToRosMsg(const WaveletOctree& map, wavemap2_msgs::msg::WaveletOctree& msg) {
+void mapToRosMsg(const WaveletOctree& map,
+                 wavemap2_msgs::msg::WaveletOctree& msg) {
   ProfilerZoneScoped;
   // Serialize the map and data structure's metadata
   msg.min_cell_width = map.getMinCellWidth();
@@ -259,7 +261,8 @@ void rosMsgToMap(const wavemap2_msgs::msg::WaveletOctree& msg,
 }
 
 void mapToRosMsg(
-    const HashedWaveletOctree& map, wavemap2_msgs::msg::HashedWaveletOctree& msg,
+    const HashedWaveletOctree& map,
+    wavemap2_msgs::msg::HashedWaveletOctree& msg,
     std::optional<std::unordered_set<Index3D, Index3DHash>> include_blocks,
     std::shared_ptr<ThreadPool> thread_pool) {
   ProfilerZoneScoped;

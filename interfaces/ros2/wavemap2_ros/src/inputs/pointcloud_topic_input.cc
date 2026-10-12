@@ -10,9 +10,9 @@
 #include <sensor_msgs/point_cloud2_iterator.hpp>
 #include <wavemap/core/utils/profile/profiler_interface.h>
 
-#include "wavemap2_ros_conversions/time_conversions.h"
 #include "wavemap2_ros/utils/pointcloud_msg_builder.h"
 #include "wavemap2_ros/utils/private_name.h"
+#include "wavemap2_ros_conversions/time_conversions.h"
 
 namespace wavemap {
 DECLARE_CONFIG_MEMBERS(PointcloudTopicInputConfig,

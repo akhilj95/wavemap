@@ -1,5 +1,5 @@
-#ifndef WAVEMAP_RVIZ_PLUGIN_ROS2_UTILS_BUTTON_PROPERTY_H_
-#define WAVEMAP_RVIZ_PLUGIN_ROS2_UTILS_BUTTON_PROPERTY_H_
+#ifndef WAVEMAP2_RVIZ_PLUGIN_UTILS_BUTTON_PROPERTY_H_
+#define WAVEMAP2_RVIZ_PLUGIN_UTILS_BUTTON_PROPERTY_H_
 
 #ifndef Q_MOC_RUN
 #include <optional>
@@ -103,4 +103,4 @@ class ButtonProperty : public rviz_common::properties::Property {
 };
 }  // namespace wavemap::rviz_plugin
 
-#endif  // WAVEMAP_RVIZ_PLUGIN_ROS2_UTILS_BUTTON_PROPERTY_H_
+#endif  // WAVEMAP2_RVIZ_PLUGIN_UTILS_BUTTON_PROPERTY_H_

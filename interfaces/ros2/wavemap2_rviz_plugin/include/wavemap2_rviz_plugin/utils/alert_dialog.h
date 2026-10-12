@@ -1,5 +1,5 @@
-#ifndef WAVEMAP_RVIZ_PLUGIN_ROS2_UTILS_ALERT_DIALOG_H_
-#define WAVEMAP_RVIZ_PLUGIN_ROS2_UTILS_ALERT_DIALOG_H_
+#ifndef WAVEMAP2_RVIZ_PLUGIN_UTILS_ALERT_DIALOG_H_
+#define WAVEMAP2_RVIZ_PLUGIN_UTILS_ALERT_DIALOG_H_
 
 #include <string>
 
@@ -14,4 +14,4 @@ class AlertDialog : public QMessageBox {
 };
 }  // namespace wavemap::rviz_plugin
 
-#endif  // WAVEMAP_RVIZ_PLUGIN_ROS2_UTILS_ALERT_DIALOG_H_
+#endif  // WAVEMAP2_RVIZ_PLUGIN_UTILS_ALERT_DIALOG_H_

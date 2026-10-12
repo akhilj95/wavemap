@@ -1,5 +1,5 @@
-#ifndef WAVEMAP_ROS_CONVERSIONS_ROS2_GEOMETRY_MSG_CONVERSIONS_H_
-#define WAVEMAP_ROS_CONVERSIONS_ROS2_GEOMETRY_MSG_CONVERSIONS_H_
+#ifndef WAVEMAP2_ROS_CONVERSIONS_GEOMETRY_MSG_CONVERSIONS_H_
+#define WAVEMAP2_ROS_CONVERSIONS_GEOMETRY_MSG_CONVERSIONS_H_
 
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/point32.hpp>
@@ -68,4 +68,4 @@ inline Transformation3D transformMsgToTransformation3D(
 }
 }  // namespace wavemap::convert
 
-#endif  // WAVEMAP_ROS_CONVERSIONS_ROS2_GEOMETRY_MSG_CONVERSIONS_H_
+#endif  // WAVEMAP2_ROS_CONVERSIONS_GEOMETRY_MSG_CONVERSIONS_H_

@@ -1,11 +1,13 @@
 #include "wavemap2_ros_conversions/config_conversions.h"
 
-#include "yaml_node_conversions.h"
-
+// NOTE: Private header next to this file (see CMakeLists.txt), so it is
+//       deliberately included without a directory.
 #include <regex>
 #include <string>
 
 #include <rclcpp/logging.hpp>
+
+#include "yaml_node_conversions.h"  // NOLINT(build/include_subdir)
 
 namespace wavemap::param::convert {
 namespace {
@@ -34,10 +36,10 @@ const std::regex kBoolFalsePattern{
     "^(?:no|No|NO|false|False|FALSE|off|Off|OFF)$"};
 const std::regex kNullPattern{"^(?:~|null|Null|NULL|)$"};
 const std::regex kIntPattern{
-    "^(?:[-+]?(?:0|[1-9][0-9]*)"     // decimal
-    "|[-+]?0b[01]+"                  // binary
-    "|[-+]?0[0-7]+"                  // octal
-    "|[-+]?0x[0-9a-fA-F]+)$"};       // hexadecimal
+    "^(?:[-+]?(?:0|[1-9][0-9]*)"  // decimal
+    "|[-+]?0b[01]+"               // binary
+    "|[-+]?0[0-7]+"               // octal
+    "|[-+]?0x[0-9a-fA-F]+)$"};    // hexadecimal
 const std::regex kFloatPattern{
     "^(?:[-+]?[0-9]+\\.[0-9]*(?:[eE][-+][0-9]+)?"  // 1.  1.5  1.5e+3
     "|[-+]?\\.[0-9]+(?:[eE][-+][0-9]+)?"           // .5  .5e-3

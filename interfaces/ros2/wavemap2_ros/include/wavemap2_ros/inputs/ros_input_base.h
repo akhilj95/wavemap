@@ -1,5 +1,5 @@
-#ifndef WAVEMAP_ROS_ROS2_INPUTS_ROS_INPUT_BASE_H_
-#define WAVEMAP_ROS_ROS2_INPUTS_ROS_INPUT_BASE_H_
+#ifndef WAVEMAP2_ROS_INPUTS_ROS_INPUT_BASE_H_
+#define WAVEMAP2_ROS_INPUTS_ROS_INPUT_BASE_H_
 
 #include <memory>
 #include <string>
@@ -81,4 +81,4 @@ class RosInputBase {
 };
 }  // namespace wavemap
 
-#endif  // WAVEMAP_ROS_ROS2_INPUTS_ROS_INPUT_BASE_H_
+#endif  // WAVEMAP2_ROS_INPUTS_ROS_INPUT_BASE_H_

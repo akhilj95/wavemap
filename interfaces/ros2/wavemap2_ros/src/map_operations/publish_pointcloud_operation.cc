@@ -12,9 +12,9 @@
 #include <wavemap/core/utils/iterate/grid_iterator.h>
 #include <wavemap/core/utils/profile/profiler_interface.h>
 
-#include "wavemap2_ros_conversions/geometry_msg_conversions.h"
 #include "wavemap2_ros/utils/pointcloud_msg_builder.h"
 #include "wavemap2_ros/utils/private_name.h"
+#include "wavemap2_ros_conversions/geometry_msg_conversions.h"
 
 namespace wavemap {
 DECLARE_CONFIG_MEMBERS(PublishPointcloudOperationConfig,
@@ -73,31 +73,31 @@ void PublishPointcloudOperation::publishPointcloud(
   std::vector<geometry_msgs::msg::Point32> points;
 
   // Define a functor that converts map leaf nodes into pointcloud points
-  auto add_points_for_leaf_node =
-      [min_cell_width = occupancy_map_->getMinCellWidth(),
-       occupancy_threshold = config_.occupancy_threshold_log_odds,
-       &point_msg_vector = points](
-          const OctreeIndex& node_index, FloatingPoint node_log_odds) {
-        if (occupancy_threshold < node_log_odds) {
-          if (node_index.height == 0) {
-            const Point3D center = convert::indexToCenterPoint(
-                node_index.position, min_cell_width);
-            point_msg_vector.emplace_back(convert::point3DToPoint32Msg(center));
-          } else {
-            const Index3D node_min_corner =
-                convert::nodeIndexToMinCornerIndex(node_index);
-            const Index3D node_max_corner =
-                convert::nodeIndexToMaxCornerIndex(node_index);
-            for (const Index3D& index :
-                 Grid(node_min_corner, node_max_corner)) {
-              const Point3D center =
-                  convert::indexToCenterPoint(index, min_cell_width);
-              point_msg_vector.emplace_back(
-                  convert::point3DToPoint32Msg(center));
-            }
-          }
+  auto add_points_for_leaf_node = [min_cell_width =
+                                       occupancy_map_->getMinCellWidth(),
+                                   occupancy_threshold =
+                                       config_.occupancy_threshold_log_odds,
+                                   &point_msg_vector = points](
+                                      const OctreeIndex& node_index,
+                                      FloatingPoint node_log_odds) {
+    if (occupancy_threshold < node_log_odds) {
+      if (node_index.height == 0) {
+        const Point3D center =
+            convert::indexToCenterPoint(node_index.position, min_cell_width);
+        point_msg_vector.emplace_back(convert::point3DToPoint32Msg(center));
+      } else {
+        const Index3D node_min_corner =
+            convert::nodeIndexToMinCornerIndex(node_index);
+        const Index3D node_max_corner =
+            convert::nodeIndexToMaxCornerIndex(node_index);
+        for (const Index3D& index : Grid(node_min_corner, node_max_corner)) {
+          const Point3D center =
+              convert::indexToCenterPoint(index, min_cell_width);
+          point_msg_vector.emplace_back(convert::point3DToPoint32Msg(center));
         }
-      };
+      }
+    }
+  };
 
   // Define a functor that allows us to skip unchanged map blocks
   auto process_block_if_changed = [this, &add_points_for_leaf_node](

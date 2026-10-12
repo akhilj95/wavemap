@@ -1,5 +1,5 @@
-#ifndef WAVEMAP_ROS_CONVERSIONS_ROS2_CONFIG_CONVERSIONS_H_
-#define WAVEMAP_ROS_CONVERSIONS_ROS2_CONFIG_CONVERSIONS_H_
+#ifndef WAVEMAP2_ROS_CONVERSIONS_CONFIG_CONVERSIONS_H_
+#define WAVEMAP2_ROS_CONVERSIONS_CONFIG_CONVERSIONS_H_
 
 #include <filesystem>
 #include <optional>
@@ -41,4 +41,4 @@ std::optional<param::Value> yamlStringToParams(
                                  "wavemap2_ros_conversions"));
 }  // namespace wavemap::param::convert
 
-#endif  // WAVEMAP_ROS_CONVERSIONS_ROS2_CONFIG_CONVERSIONS_H_
+#endif  // WAVEMAP2_ROS_CONVERSIONS_CONFIG_CONVERSIONS_H_

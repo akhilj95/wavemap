@@ -1,5 +1,5 @@
-#ifndef WAVEMAP_ROS_ROS2_INPUTS_POINTCLOUD_TOPIC_INPUT_H_
-#define WAVEMAP_ROS_ROS2_INPUTS_POINTCLOUD_TOPIC_INPUT_H_
+#ifndef WAVEMAP2_ROS_INPUTS_POINTCLOUD_TOPIC_INPUT_H_
+#define WAVEMAP2_ROS_INPUTS_POINTCLOUD_TOPIC_INPUT_H_
 
 #include <memory>
 #include <queue>
@@ -143,4 +143,4 @@ class PointcloudTopicInput : public RosInputBase {
 
 #include "wavemap2_ros/inputs/impl/pointcloud_topic_input_impl.h"
 
-#endif  // WAVEMAP_ROS_ROS2_INPUTS_POINTCLOUD_TOPIC_INPUT_H_
+#endif  // WAVEMAP2_ROS_INPUTS_POINTCLOUD_TOPIC_INPUT_H_

@@ -1,5 +1,5 @@
-#ifndef WAVEMAP_ROS_ROS2_UTILS_POINTCLOUD_MSG_BUILDER_H_
-#define WAVEMAP_ROS_ROS2_UTILS_POINTCLOUD_MSG_BUILDER_H_
+#ifndef WAVEMAP2_ROS_UTILS_POINTCLOUD_MSG_BUILDER_H_
+#define WAVEMAP2_ROS_UTILS_POINTCLOUD_MSG_BUILDER_H_
 
 #include <vector>
 
@@ -25,4 +25,4 @@ sensor_msgs::msg::PointCloud2 toPointCloud2Msg(
     const std_msgs::msg::Header& header);
 }  // namespace wavemap
 
-#endif  // WAVEMAP_ROS_ROS2_UTILS_POINTCLOUD_MSG_BUILDER_H_
+#endif  // WAVEMAP2_ROS_UTILS_POINTCLOUD_MSG_BUILDER_H_

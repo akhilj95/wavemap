@@ -1,5 +1,5 @@
-#ifndef WAVEMAP_ROS_ROS2_UTILS_IMPL_ROSBAG_PROCESSOR_INL_H_
-#define WAVEMAP_ROS_ROS2_UTILS_IMPL_ROSBAG_PROCESSOR_INL_H_
+#ifndef WAVEMAP2_ROS_UTILS_IMPL_ROSBAG_PROCESSOR_INL_H_
+#define WAVEMAP2_ROS_UTILS_IMPL_ROSBAG_PROCESSOR_INL_H_
 
 #include <functional>
 #include <string>
@@ -41,13 +41,12 @@ void RosbagProcessor::addCallback(
     void (CallbackObjectT::*function_ptr)(const MessageT&),
     CallbackObjectT* object_ptr) {
   callbacks_.try_emplace(
-      ros_topic_name,
-      [function_ptr,
-       object_ptr](const rosbag2_storage::SerializedBagMessage& msg) {
+      ros_topic_name, [function_ptr, object_ptr](
+                          const rosbag2_storage::SerializedBagMessage& msg) {
         std::invoke(function_ptr, *object_ptr,
                     detail::deserializeBagMessage<MessageT>(msg));
       });
 }
 }  // namespace wavemap
 
-#endif  // WAVEMAP_ROS_ROS2_UTILS_IMPL_ROSBAG_PROCESSOR_INL_H_
+#endif  // WAVEMAP2_ROS_UTILS_IMPL_ROSBAG_PROCESSOR_INL_H_

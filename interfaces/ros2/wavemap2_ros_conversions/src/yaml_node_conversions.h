@@ -1,5 +1,5 @@
-#ifndef WAVEMAP_ROS_CONVERSIONS_ROS2_SRC_YAML_NODE_CONVERSIONS_H_
-#define WAVEMAP_ROS_CONVERSIONS_ROS2_SRC_YAML_NODE_CONVERSIONS_H_
+#ifndef INTERFACES_ROS2_WAVEMAP2_ROS_CONVERSIONS_SRC_YAML_NODE_CONVERSIONS_H_
+#define INTERFACES_ROS2_WAVEMAP2_ROS_CONVERSIONS_SRC_YAML_NODE_CONVERSIONS_H_
 
 #include <rclcpp/logger.hpp>
 #include <wavemap/core/config/config_base.h>
@@ -14,4 +14,4 @@ param::Array toParamArray(const YAML::Node& node, const rclcpp::Logger& logger);
 param::Value toParamValue(const YAML::Node& node, const rclcpp::Logger& logger);
 }  // namespace wavemap::param::convert
 
-#endif  // WAVEMAP_ROS_CONVERSIONS_ROS2_SRC_YAML_NODE_CONVERSIONS_H_
+#endif  // INTERFACES_ROS2_WAVEMAP2_ROS_CONVERSIONS_SRC_YAML_NODE_CONVERSIONS_H_
