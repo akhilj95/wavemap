@@ -80,7 +80,7 @@ FROM workspace AS workspace-builder
 ARG COLCON_WS_PATH
 ARG PACKAGE_NAME
 WORKDIR $COLCON_WS_PATH
-RUN . /opt/ros/$ROS_DISTRO/setup.sh && \
+RUN . "/opt/ros/$ROS_DISTRO/setup.sh" && \
     colcon build --packages-up-to $PACKAGE_NAME \
       --event-handlers console_cohesion+ \
       --cmake-args -DCMAKE_BUILD_TYPE=Release
