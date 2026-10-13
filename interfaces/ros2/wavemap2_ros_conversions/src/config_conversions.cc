@@ -1,12 +1,13 @@
 #include "wavemap2_ros_conversions/config_conversions.h"
 
-// NOTE: Private header next to this file (see CMakeLists.txt), so it is
-//       deliberately included without a directory.
+#include <limits>
 #include <regex>
 #include <string>
 
 #include <rclcpp/logging.hpp>
 
+// NOTE: Private header next to this file (see CMakeLists.txt), so it is
+//       deliberately included without a directory.
 #include "yaml_node_conversions.h"  // NOLINT(build/include_subdir)
 
 namespace wavemap::param::convert {
@@ -20,15 +21,26 @@ namespace {
 // "what the ROS1 converter received", and matching it is what makes a ROS1
 // user's config behave identically here.
 //
-// The two places the versions disagree, both of which these patterns resolve
-// in PyYAML's favour:
+// Places where the versions disagree, all of which these patterns resolve in
+// PyYAML's favour:
 //   * `yes`/`no`/`on`/`off` are booleans in 1.1, plain strings in 1.2.
 //   * an unsigned exponent such as `1e3` is a *string* in PyYAML, because its
 //     float pattern requires a signed exponent. `1.0e+3` is a float in both.
+//   * a float without a leading digit takes no sign: `.5` is a float, but
+//     `-.5` and `+.5` are strings (`-0.5` is a float).
 //
+// The patterns were checked against PyYAML 6.0.3 on a table of ~75 scalars.
 // Known deviations from PyYAML, none of which appear in wavemap's shipped
-// configs: sexagesimal numbers (`1:30`) and underscore digit separators
-// (`1_000`) are not recognised and fall through to string.
+// configs:
+//   * sexagesimal numbers (`1:30`) and underscore digit separators (`1_000`)
+//     are not recognised and fall through to string.
+//   * integers outside the range of `int` become floats, since param::Value
+//     has no wider integer type.
+//   * `null`, `~` and an empty value become an empty string, with a warning,
+//     since param::Value has no null.
+//   * binary integers (`0b101`) are read by std::stoi, which only understands
+//     the `0b` prefix on glibc 2.38 or newer (Ubuntu 24.04, i.e. Jazzy, has
+//     it). On older systems they would be read as 0.
 
 // PyYAML omits bare `y`/`n` from its bool resolver, so we do too.
 const std::regex kBoolTruePattern{"^(?:yes|Yes|YES|true|True|TRUE|on|On|ON)$"};
@@ -42,9 +54,10 @@ const std::regex kIntPattern{
     "|[-+]?0x[0-9a-fA-F]+)$"};    // hexadecimal
 const std::regex kFloatPattern{
     "^(?:[-+]?[0-9]+\\.[0-9]*(?:[eE][-+][0-9]+)?"  // 1.  1.5  1.5e+3
-    "|[-+]?\\.[0-9]+(?:[eE][-+][0-9]+)?"           // .5  .5e-3
-    "|[-+]?\\.(?:inf|Inf|INF)"                     // .inf
-    "|\\.(?:nan|NaN|NAN))$"};                      // .nan
+    "|\\.[0-9]+(?:[eE][-+][0-9]+)?)$"};            // .5  .5e-3 (unsigned)
+// NOTE: These two cannot go through std::stod, which rejects the leading dot.
+const std::regex kInfPattern{"^[-+]?\\.(?:inf|Inf|INF)$"};
+const std::regex kNanPattern{"^\\.(?:nan|NaN|NAN)$"};
 
 param::Value scalarToParamValue(const YAML::Node& node,
                                 const rclcpp::Logger& logger) {
@@ -72,6 +85,13 @@ param::Value scalarToParamValue(const YAML::Node& node,
       // Out of int range. Fall through and let it be read as a float, which
       // is what PyYAML's arbitrary-precision ints degrade to here anyway.
     }
+  }
+  if (std::regex_match(scalar, kInfPattern)) {
+    constexpr double kInf = std::numeric_limits<double>::infinity();
+    return param::Value{scalar.front() == '-' ? -kInf : kInf};
+  }
+  if (std::regex_match(scalar, kNanPattern)) {
+    return param::Value{std::numeric_limits<double>::quiet_NaN()};
   }
   if (std::regex_match(scalar, kFloatPattern) ||
       std::regex_match(scalar, kIntPattern)) {

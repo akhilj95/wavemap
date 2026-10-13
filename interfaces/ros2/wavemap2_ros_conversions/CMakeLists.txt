@@ -79,12 +79,12 @@ if (BUILD_TESTING)
   # from interfaces/ros1/wavemap_ros_conversions/test. Reuses the library's
   # own test fixtures (FixtureBase, GeometryGenerator, ConfigGenerator)
   # rather than duplicating them, same as the ROS1 CMakeLists does.
-  # TIMEOUT: the default is 60s, and this binary sits right on it -- the
-  # HashedBlocks instantiation alone accounts for ~50s of it, because it is
-  # the one dense, non-hierarchical map type and the round-trip has to walk
-  # every cell. Measured, not guessed. Without this the test intermittently
-  # reports "did not generate a result file" on slower machines while every
-  # assertion in it actually passes.
+  # TIMEOUT: the default is 60s. In a Release build (this package's default,
+  # also with DCHECK_ALWAYS_ON as in CI) the binary takes about 1s, but in an
+  # unoptimized one (measured with CMAKE_BUILD_TYPE=None) it took ~90s, since
+  # the round-trip has to walk every cell of the dense HashedBlocks map.
+  # Without this, such a build reports "did not generate a result file" while
+  # every assertion in the test actually passes.
   ament_add_gtest(test_map_msg_${PROJECT_NAME}
       test/src/test_map_msg_conversions.cc
       TIMEOUT 300)

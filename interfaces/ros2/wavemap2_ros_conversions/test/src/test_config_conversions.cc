@@ -1,3 +1,4 @@
+#include <cmath>
 #include <filesystem>
 #include <string>
 
@@ -80,6 +81,41 @@ TEST(ConfigConversions, ExponentFormsMatchPyYaml) {
   // a string. yaml-cpp's native YAML 1.2 behaviour would disagree.
   EXPECT_EQ(typeOf("1e3"), "str:1e3");
   EXPECT_EQ(typeOf("1.0e+3").substr(0, 5), "float");
+}
+
+TEST(ConfigConversions, LeadingDotFloatsTakeNoSignLikePyYaml) {
+  // PyYAML's float pattern only allows a sign when a digit precedes the dot,
+  // so these are strings there, not floats.
+  EXPECT_EQ(typeOf(".5").substr(0, 5), "float");
+  EXPECT_EQ(typeOf(".5e-3").substr(0, 5), "float");
+  EXPECT_EQ(typeOf("-0.5").substr(0, 5), "float");
+  EXPECT_EQ(typeOf("-.5"), "str:-.5");
+  EXPECT_EQ(typeOf("+.5"), "str:+.5");
+  EXPECT_EQ(typeOf("-.5e-3"), "str:-.5e-3");
+}
+
+TEST(ConfigConversions, InfinityAndNanMatchPyYaml) {
+  // std::stod cannot read the leading dot of these, so they are resolved
+  // explicitly. PyYAML allows a sign on .inf but not on .nan.
+  const auto value_of = [](const std::string& scalar) {
+    return parse("key: " + scalar).getChildAs<FloatingPoint>("key");
+  };
+  for (const std::string scalar : {".inf", ".Inf", ".INF", "+.inf"}) {
+    const auto value = value_of(scalar);
+    ASSERT_TRUE(value.has_value()) << scalar;
+    EXPECT_TRUE(std::isinf(*value) && 0 < *value) << scalar;
+  }
+  const auto negative_inf = value_of("-.inf");
+  ASSERT_TRUE(negative_inf.has_value());
+  EXPECT_TRUE(std::isinf(*negative_inf) && *negative_inf < 0);
+  for (const std::string scalar : {".nan", ".NaN", ".NAN"}) {
+    const auto value = value_of(scalar);
+    ASSERT_TRUE(value.has_value()) << scalar;
+    EXPECT_TRUE(std::isnan(*value)) << scalar;
+  }
+  EXPECT_EQ(typeOf("-.nan"), "str:-.nan");
+  EXPECT_EQ(typeOf("inf"), "str:inf");
+  EXPECT_EQ(typeOf("nan"), "str:nan");
 }
 
 TEST(ConfigConversions, NestedSequencesOfMapsSurvive) {

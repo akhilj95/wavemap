@@ -143,10 +143,16 @@ bool RosbagProcessor::processAll() {
         simulated_clock_pub_->publish(clock_msg);
       }
 
-      // Process node callbacks (publishers, timers, /clock delivery, and
-      // crucially delivering this batch's republished /tf messages to our
-      // own TransformListener) before draining the input queues below, so
-      // their transform lookups see the up-to-date tf_buffer_.
+      // Process the node's own callbacks before draining the input queues
+      // below.
+      // NOTE: This does not deliver the /tf messages republished above. The
+      //       TransformListener (see TfTransformer) subscribes to /tf and
+      //       /tf_static in a callback group that is not part of the node's
+      //       executor and spins it on a thread of its own, tf2's default.
+      //       So nothing here waits for this batch's transforms to reach
+      //       tf_buffer_ before the queues are drained. Whether they have
+      //       arrived by then is a matter of timing, as described in
+      //       rosbag_processor.h.
       {
         ProfilerZoneScopedN("rosbagSpinSome");
         rclcpp::spin_some(node_.get_node_base_interface());
