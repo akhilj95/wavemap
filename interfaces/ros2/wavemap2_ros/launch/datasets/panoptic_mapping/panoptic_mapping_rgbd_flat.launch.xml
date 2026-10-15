@@ -8,10 +8,15 @@
   <arg name="use_batch_mode" default="false"
        description="Whether to replay the experiment using panoptic mapping's data player, or process it in batch mode.
             If you would like to use batch_mode, please replay the data once, record it into a rosbag
-            and update the rosbag_path at the bottom of this launch file."/>
+            with 'ros2 bag record -o &lt;base_path&gt;/run1_ros2 ...', or pass the location of your rosbag2
+            directory through the rosbag_path argument."/>
   <!-- NOTE: Relative paths will be resolved w.r.t. ROS_HOME (default ~/.ros) -->
   <arg name="base_path"
        default="../data/panoptic_mapping/flat_dataset/run1"/>
+  <!-- NOTE: Only used in batch mode. ROS2 bags are directories, not .bag files like in ROS1. -->
+  <arg name="rosbag_path"
+       default="$(var base_path)/run1_ros2"
+       description="Rosbag2 directory to ingest in batch mode. Relative paths are resolved w.r.t. ROS_HOME."/>
   <arg name="play_rate" default="1.0"/>
   <arg name="wait" default="false"/>
   <arg name="namespace" default="data"/>
@@ -44,8 +49,6 @@
   </group>
   <group if="$(var use_batch_mode)">
     <!-- Directly ingest the preprocessed rosbag -->
-    <let name="rosbag_path"
-         value="$(var base_path)/run1.bag"/>
     <!-- Run wavemap -->
     <include file="$(find-pkg-share wavemap2_ros)/launch/datasets/dataset_base.launch.xml"/>
   </group>
