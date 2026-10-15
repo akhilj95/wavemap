@@ -8,6 +8,7 @@
   <license>BSD</license>
   <url>https://github.com/ethz-asl/wavemap</url>
 
+  <author email="victorr@ethz.ch">Victor Reijgwart</author>
   <author email="akhilmjohn@gmail.com">Akhil John</author>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
