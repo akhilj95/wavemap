@@ -1,6 +1,9 @@
 ARG VERSION=latest
 
-FROM ghcr.io/ethz-asl/wavemap2:${VERSION}
+# NOTE: This is the image built by the Docker instructions in the ROS2
+#       installation docs (--tag=wavemap2), so it works without a published
+#       image.
+FROM wavemap2:${VERSION}
 
 # Create a non-root user and make it the default user
 # NOTE: The ROS2 base image already ships an 'ubuntu' user with UID/GID 1000,
