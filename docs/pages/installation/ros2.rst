@@ -133,6 +133,19 @@ The resulting ``your_bag`` directory can be passed to ``rosbag_path`` like any o
     Instead, it reports that frames such as ``odom`` do not exist and skips every input.
     This can be fixed at replay time with ``ros2 bag play --qos-profile-overrides-path``.
 
-.. note::
+.. _installation-ros2-large-pointclouds:
 
-    ``wavemap_server.launch.xml`` sets ``FASTDDS_BUILTIN_TRANSPORTS=UDPv4`` on the ``wavemap`` node because Fast DDS's default shared-memory transport silently drops most of a large best-effort topic (e.g. Ouster pointclouds) once the node falls behind. If you run ``ros_server`` directly, or write your own launch files around it instead of including ``wavemap_server.launch.xml``, set this environment variable yourself to avoid silent data loss.
+Large pointclouds over DDS
+**************************
+When pointclouds arrive over a ROS2 topic, rather than through the rosbag processor, two settings are needed to receive large clouds, such as an Ouster's, without silently losing most of them.
+
+First, ``wavemap_server.launch.xml`` sets ``FASTDDS_BUILTIN_TRANSPORTS=UDPv4`` on the ``wavemap`` node, because Fast DDS's default shared-memory transport silently drops most of a large best-effort topic once the node falls behind.
+If you run ``ros_server`` directly, or write your own launch files around it instead of including ``wavemap_server.launch.xml``, set this environment variable yourself.
+
+Second, over UDP, the kernel's receive buffer must be large enough to hold a whole pointcloud.
+Fast DDS does not choose a buffer size for its sockets, so they get the system default, ``net.core.rmem_default``, which is about 208 KB on Ubuntu.
+Raise the limit and the default with::
+
+    sudo sysctl -w net.core.rmem_max=67108864 net.core.rmem_default=67108864
+
+When running wavemap in Docker, set them on the host.
