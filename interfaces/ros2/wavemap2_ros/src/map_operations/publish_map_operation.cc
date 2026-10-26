@@ -10,6 +10,7 @@
 
 #include "wavemap2_ros/utils/private_name.h"
 #include "wavemap2_ros_conversions/map_msg_conversions.h"
+#include "wavemap2_ros_conversions/map_msg_layout.h"
 
 namespace wavemap {
 DECLARE_CONFIG_MEMBERS(PublishMapOperationConfig,
@@ -43,6 +44,13 @@ PublishMapOperation::PublishMapOperation(
   //       missing downstream until the next full retransmission.
   map_pub_ = node.create_publisher<wavemap2_msgs::msg::Map>(
       privateName(config_.topic), rclcpp::QoS(10));
+  // Subscribers can only read the maps if their wavemap2_msgs was built with
+  // the same layout, so state it where users will look when they can't
+  RCLCPP_INFO_STREAM(node.get_logger(),
+                     "Publishing maps on '"
+                         << map_pub_->get_topic_name() << "' using the '"
+                         << convert::kMapMsgNodeLayoutName
+                         << "' map message layout (WAVEMAP2_MSGS_LAYOUT).");
   republish_whole_map_srv_ = node.create_service<std_srvs::srv::Empty>(
       privateName(config_.topic + "_request_full"),
       [this](const std::shared_ptr<std_srvs::srv::Empty::Request> /*request*/,

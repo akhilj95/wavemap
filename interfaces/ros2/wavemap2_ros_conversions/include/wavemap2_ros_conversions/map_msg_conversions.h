@@ -18,9 +18,13 @@
 #include <wavemap/core/utils/thread_pool.h>
 #include <wavemap2_msgs/msg/map.hpp>
 
-// Mechanical port of interfaces/ros1/wavemap_ros_conversions, same algorithms
-// throughout. Only the ROS-specific surface changed: ros::Time -> rclcpp::Time
-// and wavemap_msgs::* -> wavemap2_msgs::msg::*.
+// Port of interfaces/ros1/wavemap_ros_conversions, same algorithms throughout.
+// Besides ros::Time -> rclcpp::Time and wavemap_msgs::* ->
+// wavemap2_msgs::msg::*, it differs in that it
+// - supports both octree node layouts wavemap2_msgs can be built with (see
+//   map_msg_layout.h)
+// - checks that the octree nodes it deserializes form valid octrees, which is
+//   why the octree rosMsgToMap() overloads return bool instead of void
 namespace wavemap::convert {
 bool mapToRosMsg(const MapBase& map, const std::string& frame_id,
                  const rclcpp::Time& stamp, wavemap2_msgs::msg::Map& msg,
@@ -37,7 +41,8 @@ void rosMsgToMap(const wavemap2_msgs::msg::HashedBlocks& msg,
 
 void mapToRosMsg(const WaveletOctree& map,
                  wavemap2_msgs::msg::WaveletOctree& msg);
-void rosMsgToMap(const wavemap2_msgs::msg::WaveletOctree& msg,
+// Returns false and clears the map if the msg's nodes don't form a valid octree
+bool rosMsgToMap(const wavemap2_msgs::msg::WaveletOctree& msg,
                  WaveletOctree::Ptr& map);
 
 void mapToRosMsg(const HashedWaveletOctree& map,
@@ -49,7 +54,9 @@ void blockToRosMsg(const HashedWaveletOctree::BlockIndex& block_index,
                    const HashedWaveletOctree::Block& block,
                    FloatingPoint min_log_odds, FloatingPoint max_log_odds,
                    wavemap2_msgs::msg::HashedWaveletOctreeBlock& msg);
-void rosMsgToMap(const wavemap2_msgs::msg::HashedWaveletOctree& msg,
+// Returns false if any block's nodes don't form a valid octree, after erasing
+// those blocks and deserializing all the others
+bool rosMsgToMap(const wavemap2_msgs::msg::HashedWaveletOctree& msg,
                  HashedWaveletOctree::Ptr& map);
 
 void mapToRosMsg(const HashedChunkedWaveletOctree& map,
