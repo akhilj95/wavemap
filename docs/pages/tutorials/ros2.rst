@@ -56,6 +56,8 @@ Wavemap's ROS2 server offers the same ways to publish its maps to ROS topics as 
 
 The map is published with reliable QoS. To subscribe to it from your own node, both reliable and best-effort subscriptions work.
 
+The map messages' octree nodes are laid out as flat arrays by default, rather than as the ROS1 messages' ``WaveletOctreeNode[]`` arrays, since this is much faster to send over DDS. Your node must be built with the same :ref:`map message layout <installation-ros2-map-msg-layout>` as the server.
+
 Saving maps
 ===========
 The server's map can also be written to disk by calling its ``save_map`` service as follows:
@@ -200,3 +202,5 @@ and maps can be sent over ROS2 with
     }
 
 A message published right after the publisher is created is usually lost, because subscribers take a moment to discover a new publisher. This is why the example keeps publishing on a timer.
+
+Both examples work with either :ref:`map message layout <installation-ros2-map-msg-layout>`, since ``mapToRosMsg`` and ``rosMsgToMap`` handle the layout for you. Only code that reads or writes the octree nodes in the messages directly depends on the layout. If such code only supports one layout, it can say so with ``static_assert(wavemap::convert::kMapMsgsUseFlatNodeLayout, "...")`` (or ``!kMapMsgsUseFlatNodeLayout`` for the nested layout), from ``wavemap2_ros_conversions/map_msg_layout.h``, so that building it against the other layout fails with your message. Code that supports both layouts has to access the layout-specific fields from templates, using ``if constexpr`` with the ``HasFlatNodeLayout`` trait from the same header, as :gh_file:`map_msg_conversions.cc <interfaces/ros2/wavemap2_ros_conversions/src/map_msg_conversions.cc>` does. ``rosMsgToMap`` returns ``false`` if a message's octree nodes are inconsistent, and discards the affected parts of the map.
