@@ -183,11 +183,19 @@ jobs:
           echo "::remove-matcher owner=problem-matcher-gcc::"
 
   test:
-    name: Test
+    name: Test (${{ matrix.map_msgs_layout }} map msgs)
     needs: [ workspace-container, build ]
     runs-on: ubuntu-24.04
     container:
       image: ${{ needs.workspace-container.outputs.image }}
+    # NOTE: wavemap2_msgs can be built with either octree node layout (see
+    #       WAVEMAP2_MSGS_LAYOUT in its CMakeLists.txt), and the code that
+    #       uses it compiles differently for each. The other jobs only cover
+    #       the default 'flat' layout.
+    strategy:
+      matrix:
+        map_msgs_layout: [ flat, nested ]
+      fail-fast: false
     steps:
       - name: Fetch the package's repository
         uses: actions/checkout@v4
@@ -198,7 +206,7 @@ jobs:
       - name: Setup ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
-          key: ${{ secrets.CCACHE_CACHE_VERSION }}|ubuntu-24.04-gcc-ros2
+          key: ${{ secrets.CCACHE_CACHE_VERSION }}|ubuntu-24.04-gcc-ros2-${{ matrix.map_msgs_layout }}-map-msgs
           create-symlink: true
 
       - name: Build code and unit tests
@@ -209,7 +217,8 @@ jobs:
           echo "::add-matcher::./.github/problem-matchers/gcc.json"
           colcon build --packages-up-to wavemap2_all \
             --event-handlers console_cohesion+ \
-            --cmake-args -DCMAKE_BUILD_TYPE=Release -DDCHECK_ALWAYS_ON=ON -DBUILD_TESTING=ON
+            --cmake-args -DCMAKE_BUILD_TYPE=Release -DDCHECK_ALWAYS_ON=ON -DBUILD_TESTING=ON \
+            -DWAVEMAP2_MSGS_LAYOUT=${{ matrix.map_msgs_layout }}
           echo "::remove-matcher owner=problem-matcher-gcc::"
 
       - name: Run unit tests

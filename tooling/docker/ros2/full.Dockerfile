@@ -77,13 +77,17 @@ FROM workspace AS workspace-builder
 # Build our package
 # NOTE: colcon has no persistent workspace configuration equivalent to
 #       `catkin config --cmake-args`, so the build type is passed explicitly.
+# NOTE: WAVEMAP2_MSGS_LAYOUT selects the map msgs' octree node layout, see
+#       interfaces/ros2/wavemap2_msgs/CMakeLists.txt.
 ARG COLCON_WS_PATH
 ARG PACKAGE_NAME
+ARG WAVEMAP2_MSGS_LAYOUT=flat
 WORKDIR $COLCON_WS_PATH
 RUN . "/opt/ros/$ROS_DISTRO/setup.sh" && \
     colcon build --packages-up-to $PACKAGE_NAME \
       --event-handlers console_cohesion+ \
-      --cmake-args -DCMAKE_BUILD_TYPE=Release
+      --cmake-args -DCMAKE_BUILD_TYPE=Release \
+      -DWAVEMAP2_MSGS_LAYOUT=$WAVEMAP2_MSGS_LAYOUT
 
 
 FROM workspace AS workspace-built
