@@ -1,59 +1,134 @@
-# Wavemap
-<a href="https://github.com/ethz-asl/wavemap/actions/workflows/cpp.yml"><img src="https://img.shields.io/github/actions/workflow/status/ethz-asl/wavemap/cpp.yml?label=C%2b%2b&logo=C%2b%2b&logoColor=white" alt="C++"/></a>
-<a href="https://github.com/ethz-asl/wavemap/actions/workflows/python.yml"><img src="https://img.shields.io/github/actions/workflow/status/ethz-asl/wavemap/python.yml?label=Python&logo=python&logoColor=white" alt="Python"/></a>
-<a href="https://github.com/ethz-asl/wavemap/actions/workflows/ros1.yml"><img src="https://img.shields.io/github/actions/workflow/status/ethz-asl/wavemap/ros1.yml?label=ROS1&logo=ros&logoColor=white" alt="ROS1"/></a>
-<a href="https://github.com/ethz-asl/wavemap/actions/workflows/docs.yml"><img src="https://img.shields.io/github/actions/workflow/status/ethz-asl/wavemap/docs.yml?label=Docs&logo=sphinx&logoColor=white" alt="Docs"/></a>
-<a href="https://github.com/ethz-asl/wavemap/releases"><img src="https://img.shields.io/github/v/tag/ethz-asl/wavemap?label=Version&logo=semver" alt="Version"/></a>
-<a href="https://github.com/ethz-asl/wavemap/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-BSD%203-blue?logo=bsd" alt="License"/></a>
-[![3D reconstruction of Newer College's Cloister](https://github.com/ethz-asl/wavemap/assets/6238939/e432d4ea-440d-4e9d-adf9-af3ae3b09a10)](https://www.youtube.com/live/ftQhK75Ri1E?si=9txTYyJ78wQuhyN-&t=733)
+# Wavemap for ROS2
 
-## Hierarchical, multi-resolution volumetric mapping
-Wavemap achieves state-of-the-art memory and computational efficiency by combining Haar wavelet compression and a coarse-to-fine measurement integration scheme. Advanced measurement models allow it to attain exceptionally high recall rates on challenging obstacles like thin objects.
+This repository is a fork of [wavemap](https://github.com/ethz-asl/wavemap), developed by the Autonomous Systems Lab at ETH Zurich, that adds a ROS2 interface.
+The interface targets [ROS 2 Jazzy](https://docs.ros.org/en/jazzy/) on Ubuntu 24.04 (Noble).
+It provides the same server and rosbag processor as wavemap's ROS1 interface, with the same topic and service names, and reads the same YAML config files unmodified.
 
-The framework is very flexible and supports several data structures, measurement integration methods, and sensor models out of the box. The ROS interface can, for example, easily be configured to fuse multiple sensor inputs, such as a LiDAR configured with a range of 20m and several depth cameras up to a resolution of 1cm, into a single multi-resolution occupancy grid map.
+> **Map messages differ from ROS1 by default.**
+> The octree nodes in wavemap's ROS2 map messages are sent as flat arrays (the `flat` layout), because DDS sends these much faster than ROS1's array of `WaveletOctreeNode` messages.
+> ROS1's layout is available as the `nested` build option, for example to bridge maps to ROS1.
+> Every node that exchanges maps with wavemap, including Rviz2 with wavemap's plugin, must be built with the same layout as the server, or it cannot read the maps.
+> Saved `.wvmp` map files do not depend on the layout, and are the same as in ROS1.
+> See [map message layout](interfaces/ros2/docs/map_message_layout.md).
 
-Wavemap provides [C++](https://ethz-asl.github.io/wavemap/pages/tutorials/cpp) and [Python](https://ethz-asl.github.io/wavemap/pages/tutorials/python) APIs and an interface to [ROS1](https://ethz-asl.github.io/wavemap/pages/tutorials/ros1). The code is extensively tested on Intel, AMD and ARM CPUs on Ubuntu 20.04, 22.04 and 24.04. Example Docker files [are available](https://github.com/ethz-asl/wavemap/tree/main/tooling/docker) and documented in the [installation instructions](https://ethz-asl.github.io/wavemap/pages/installation/index). We [welcome contributions](https://ethz-asl.github.io/wavemap/pages/contributing).
+The ROS2 interface lives in [`interfaces/ros2`](interfaces/ros2).
+Wavemap's library, its C++ and Python APIs and its ROS1 interface are unchanged from upstream.
 
-⭐ If you find wavemap useful, star it on GitHub to get notified of new releases!
+## About wavemap
 
+Wavemap is a hierarchical, multi-resolution volumetric mapping framework.
+It achieves memory and computational efficiency by combining Haar wavelet compression and a coarse-to-fine measurement integration scheme. The framework is very flexible and supports several data structures, measurement integration methods, and sensor models out of the box.
+Its ROS interfaces can, for example, easily be configured to fuse multiple sensor inputs, such as a LiDAR configured with a range of 20m and several depth cameras up to a resolution of 1cm, into a single multi-resolution occupancy grid map.
+
+Wavemap provides [C++](https://ethz-asl.github.io/wavemap/pages/tutorials/cpp.html) and [Python](https://ethz-asl.github.io/wavemap/pages/tutorials/python.html) APIs and an interface to [ROS1](https://ethz-asl.github.io/wavemap/pages/tutorials/ros1.html), all documented on [wavemap's documentation site](https://ethz-asl.github.io/wavemap/).
+
+## Building
+
+Both builds by default use the `flat` map message layout (which differs from the ROS1 structure). The ROS1 message structure can be selected with the `nested` option.
+More details, including the VS Code devcontainer, are on the [installation page](interfaces/ros2/docs/installation.md).
+
+### Docker
+
+```bash
+git clone https://github.com/akhilj95/wavemap.git
+cd wavemap
+docker build --target=workspace-built --tag=wavemap2 -f tooling/docker/ros2/full.Dockerfile .
+```
+
+For the `nested` layout, add `--build-arg WAVEMAP2_MSGS_LAYOUT=nested`.
+
+To start a container that can open Rviz2 on your display, with your `~/data` folder mounted at `/home/ci/data`, run:
+
+```bash
+xhost +local:docker
+docker run --rm -it --network host \
+  -e DISPLAY="${DISPLAY}" -e QT_X11_NO_MITSHM=1 \
+  -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
+  -v ~/data:/home/ci/data \
+  wavemap2
+```
+
+The workspace in the container is already built and sourced.
+The image uses Cyclone DDS, already configured for wavemap's large messages, rather than ROS 2 Jazzy's default, Fast DDS. Nodes outside the container that communicate with wavemap must use it too, see the [DDS page](interfaces/ros2/docs/dds.md#cyclone-dds).
+
+### Native
+
+With [ROS 2 Jazzy](https://docs.ros.org/en/jazzy/Installation/Ubuntu-Install-Debs.html) installed (`ros-jazzy-ros-base` is enough):
+
+```bash
+sudo apt install git build-essential python3-rosdep python3-colcon-common-extensions
+git clone https://github.com/akhilj95/wavemap.git ~/wavemap
+
+# Make a ros2 workspace and link the ROS2 packages into it instead of the whole repo
+mkdir -p ~/ros2_ws/src
+ln -s ~/wavemap/interfaces/ros2 ~/ros2_ws/src/wavemap
+
+source /opt/ros/jazzy/setup.bash
+sudo rosdep init  # Skip if rosdep is already initialized
+rosdep update
+rosdep install -y --from-paths ~/ros2_ws/src --ignore-src
+cd ~/ros2_ws
+colcon build --packages-up-to wavemap2_all --cmake-args -DCMAKE_BUILD_TYPE=Release
+source ~/ros2_ws/install/setup.bash
+```
+
+Only `interfaces/ros2` is linked into the workspace, since colcon would otherwise treat the whole repository as a single package.
+For the `nested` layout, add `-DWAVEMAP2_MSGS_LAYOUT=nested` after `-DCMAKE_BUILD_TYPE=Release`.
+
+## Running the server
+
+Wavemap needs two inputs: depth measurements, as pointclouds or depth images, and the sensor's pose for each measurement, which it looks up in TF.
+**The poses have to come from an odometry system that publishes them to TF.**
+Wavemap does not estimate them itself.
+The [odometry page](interfaces/ros2/docs/odometry.md) describes the TF frames wavemap needs and how to connect it to iG-LIO.
+
+Copy one of the example configs, set its input topic to your sensor's (`topic_name`) and its `world_frame` to your odometry's fixed frame, and start the server with:
+
+```bash
+cp $(ros2 pkg prefix wavemap2_ros)/share/wavemap2_ros/config/wavemap_ouster_os0.yaml ~/my_config.yaml
+ros2 launch wavemap2_ros wavemap_server.launch.xml param_file:=$HOME/my_config.yaml
+```
+
+The example configs cover Ouster and Livox LiDARs and several depth cameras, and their settings are explained on the upstream [parameters page](https://ethz-asl.github.io/wavemap/pages/parameters/index.html).
+Large pointclouds received over live topics, such as an Ouster's, need suitable DDS middleware settings, or most of them are silently lost. The [DDS page](interfaces/ros2/docs/dds.md) describes them for Fast DDS and Cyclone DDS.
+
+To save the map, run:
+
+```bash
+ros2 service call /wavemap/save_map wavemap2_msgs/srv/FilePath "{file_path: /path/to/map.wvmp}"
+```
+
+The [usage page](interfaces/ros2/docs/usage.md) covers the launch files' arguments, replaying and batch-processing rosbags, the demos, and the server's other services.
+
+## Visualization
+
+The launch files open Rviz2 with wavemap's map display, which shows the server's map on the `/wavemap/map` topic as it is built.
+Pass `show_rviz:=false` on machines without a display.
+
+Saved `.wvmp` maps, including maps saved with ROS1, can be opened without the server: run `rviz2`, add the `wavemap2_rviz_plugin/WavemapMap` display, set its `Source` to `File`, and choose the file under `Loaded map`.
+The display's `Render voxels` and `Render slice` options control how the map is drawn.
 
 ## Documentation
-The framework's documentation is available on [GitHub Pages](https://ethz-asl.github.io/wavemap/) for easy online access. A PDF version of each release’s documentation can also be found in the respective [release notes](https://github.com/ethz-asl/wavemap/releases).
 
-### Table of contents
-* [Installation](https://ethz-asl.github.io/wavemap/pages/installation)
-* [Demos](https://ethz-asl.github.io/wavemap/pages/demos)
-* [Tutorials](https://ethz-asl.github.io/wavemap/pages/tutorials)
-* [Parameters](https://ethz-asl.github.io/wavemap/pages/parameters)
-* [Contributing](https://ethz-asl.github.io/wavemap/pages/contributing)
-* [C++ API](https://ethz-asl.github.io/wavemap/cpp_api/unabridged_api)
-* [Python API](https://ethz-asl.github.io/wavemap/python_api)
-* [FAQ](https://ethz-asl.github.io/wavemap/pages/faq)
+The ROS2 interface is documented in [`interfaces/ros2/docs`](interfaces/ros2/docs):
 
-## Paper
-A technical introduction to the theory behind wavemap is provided in our open-access RSS paper, available [here](https://www.roboticsproceedings.org/rss19/p065.pdf). For a quick overview, watch the accompanying 5-minute presentation [here](https://www.youtube.com/live/ftQhK75Ri1E?si=9txTYyJ78wQuhyN-&t=733).
+* [Installation](interfaces/ros2/docs/installation.md): Docker image and container, VS Code devcontainer, native build, and build options
+* [Map message layout](interfaces/ros2/docs/map_message_layout.md): the `flat` and `nested` layouts, choosing between them, and diagnosing mismatches
+* [Usage](interfaces/ros2/docs/usage.md): launch files, the server and the rosbag processor, the demos, Rviz2, and services
+* [DDS middleware](interfaces/ros2/docs/dds.md): Fast DDS and Cyclone DDS settings for large pointclouds and maps, UDP buffers, and containers
+* [Odometry](interfaces/ros2/docs/odometry.md): the TF frames wavemap needs, and iG-LIO
+* [Your own code](interfaces/ros2/docs/your_own_code.md): using wavemap's ROS2 packages in your own ROS2 package, with code examples
 
-<details>
-<summary>Abstract</summary>
-<br>
-Volumetric maps are widely used in robotics due to their desirable properties in applications such as path planning, exploration, and manipulation. Constant advances in mapping technologies are needed to keep up with the improvements in sensor technology, generating increasingly vast amounts of precise measurements. Handling this data in a computationally and memory-efficient manner is paramount to representing the environment at the desired scales and resolutions. In this work, we express the desirable properties of a volumetric mapping framework through the lens of multi-resolution analysis. This shows that wavelets are a natural foundation for hierarchical and multi-resolution volumetric mapping. Based on this insight we design an efficient mapping system that uses wavelet decomposition. The efficiency of the system enables the use of uncertainty-aware sensor models, improving the quality of the maps. Experiments on both synthetic and real-world data provide mapping accuracy and runtime performance comparisons with state-of-the-art methods on both RGB-D and 3D LiDAR data. The framework is open-sourced to allow the robotics community at large to explore this approach.
-</details>
+Everything that is not specific to ROS2 is documented on [wavemap's documentation site](https://ethz-asl.github.io/wavemap/):
 
-Please cite this paper when using wavemap for research.
+* [Parameters](https://ethz-asl.github.io/wavemap/pages/parameters/index.html): all config file settings, which apply unchanged in ROS2
+* [Demos](https://ethz-asl.github.io/wavemap/pages/demos.html): the datasets and pre-built maps used by the demos
+* [C++ library](https://ethz-asl.github.io/wavemap/pages/tutorials/cpp.html) and [Python package](https://ethz-asl.github.io/wavemap/pages/tutorials/python.html): working with saved maps, with or without ROS
+* [ROS1 installation](https://ethz-asl.github.io/wavemap/pages/installation/ros1.html) and [ROS1 interface](https://ethz-asl.github.io/wavemap/pages/tutorials/ros1.html)
+* [FAQ](https://ethz-asl.github.io/wavemap/pages/faq.html)
 
-APA-style:
-```
-Reijgwart, V., Cadena, C., Siegwart, R., & Ott, L. (2023). Efficient volumetric mapping of multi-scale environments using wavelet-based compression. Proceedings of Robotics: Science and Systems XIX. https://doi.org/10.15607/RSS.2023.XIX.065
-```
+## License and credits
 
-BibTeX:
-```
-@INPROCEEDINGS{reijgwart2023wavemap,
-    author = {Reijgwart, Victor and Cadena, Cesar and Siegwart, Roland and Ott, Lionel},
-    journal = {Robotics: Science and Systems. Online Proceedings},
-    title = {Efficient volumetric mapping of multi-scale environments using wavelet-based compression},
-    year = {2023-07},
-}
-```
-
-Note that the code has significantly improved since the paper was written. Wavemap is now up to 10x faster, thanks to new multi-threaded measurement integrators, and uses up to 50% less RAM, by virtue of new memory efficient data structures inspired by [OpenVDB](https://github.com/AcademySoftwareFoundation/openvdb).
+Wavemap is released under the [BSD 3-Clause License](LICENSE), copyright Autonomous Systems Lab, ETH Zurich.
+The ROS2 interface was added in this fork by [akhilj95](https://github.com/akhilj95) and is released under the same license.
+For wavemap itself, please refer to the [upstream repository](https://github.com/ethz-asl/wavemap).

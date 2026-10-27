@@ -1,6 +1,6 @@
 Tutorials
 #########
-This section provides hands-on examples of how to use wavemap's C++ and Python APIs, and its ROS1 and ROS2 interfaces.
+This section provides hands-on examples of how to use wavemap's C++ and Python APIs, and its ROS1 interface.
 
 .. toctree::
     :caption: Interfaces
@@ -9,4 +9,3 @@ This section provides hands-on examples of how to use wavemap's C++ and Python A
     cpp
     python
     ros1
-    ros2
