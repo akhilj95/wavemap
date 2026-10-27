@@ -43,7 +43,8 @@ ARG ROS_HOME
 ENV ROS_HOME=$ROS_HOME
 # hadolint ignore=DL3008
 RUN apt-get update && \
-    apt-get install -q -y --no-install-recommends git ccache && \
+    apt-get install -q -y --no-install-recommends git ccache \
+      "ros-${ROS_DISTRO}-rmw-cyclonedds-cpp" && \
     rosdep update --rosdistro "$ROS_DISTRO" && \
     rosdep install --from-paths interfaces/ros2 --ignore-src -q -y && \
     rm -rf /var/lib/apt/lists/* /tmp/manifests
@@ -61,6 +62,13 @@ ARG COLCON_WS_PATH
 COPY --from=source-filter $REPOSITORY_PATH $REPOSITORY_PATH
 RUN mkdir -p $COLCON_WS_PATH/src && \
     ln -s $REPOSITORY_PATH/interfaces/ros2 $COLCON_WS_PATH/src/wavemap
+
+# Use Cyclone DDS with wavemap's settings for large messages by default
+# NOTE: The config is read from the repository rather than the install space,
+#       so that it is also available in this unbuilt stage. See
+#       interfaces/ros2/docs/dds.md.
+ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp \
+    CYCLONEDDS_URI=file://$REPOSITORY_PATH/interfaces/ros2/wavemap2_ros/config/cyclonedds.xml
 
 # Update the entrypoint to also source the workspace, once it has been built
 # hadolint ignore=SC2016

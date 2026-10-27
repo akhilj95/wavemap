@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Cyclone DDS settings for wavemap's large pointcloud and map messages,
+     based on Autoware's. The Docker image selects this file through
+     CYCLONEDDS_URI, see interfaces/ros2/docs/dds.md. -->
+<CycloneDDS xmlns="https://cdds.io/config">
+  <Domain Id="any">
+    <General>
+      <!-- Send large messages in fewer, larger UDP datagrams -->
+      <MaxMessageSize>65500B</MaxMessageSize>
+    </General>
+    <Internal>
+      <!-- Request a 10 MB receive buffer for each socket. The kernel caps it
+           at net.core.rmem_max, so raise that on the host. Unlike min, max
+           does not stop Cyclone DDS from starting if rmem_max is lower. -->
+      <SocketReceiveBufferSize max="10MB"/>
+    </Internal>
+  </Domain>
+</CycloneDDS>
