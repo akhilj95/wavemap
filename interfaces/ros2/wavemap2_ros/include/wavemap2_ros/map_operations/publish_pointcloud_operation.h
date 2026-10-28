@@ -50,12 +50,9 @@ class PublishPointcloudOperation : public MapOperationBase {
   // The node's clock, held so that run() can read the time under whichever
   // clock the node uses (sim time during bag replay, system time otherwise).
   rclcpp::Clock::SharedPtr clock_;
-  // NOTE: Explicitly constructed with the node clock's type, not
-  //       default-constructed. ROS1 used a default ros::Time{} here, but a
-  //       default rclcpp::Time is RCL_SYSTEM_TIME, and ROS2 throws on
-  //       subtracting times of differing clock types -- so `current_time -
-  //       last_run_timestamp_` in shouldRun() would throw on the very first
-  //       call.
+  // NOTE: Constructed with the node clock's type, since a default
+  //       rclcpp::Time is RCL_SYSTEM_TIME and rclcpp throws when subtracting
+  //       times of different clock types, as shouldRun() does.
   rclcpp::Time last_run_timestamp_;
 
   // Pointcloud publishing

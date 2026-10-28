@@ -38,9 +38,8 @@ bool RosbagProcessor::addRosbags(std::istringstream& rosbag_paths) {
       return false;
     }
   }
-  // NOTE: ROS1's rosbag::Bag constructor threw on a missing file, ending the
-  //       program. rosbag2's exception is caught in addRosbag so that all bad
-  //       paths get reported at once, but a failure must still be a failure.
+  // NOTE: addRosbag() reports each bag that fails to open, so that all bad
+  //       paths are reported at once before failing.
   return opened_rosbags_.size() - num_bags_before == num_requested;
 }
 
@@ -62,8 +61,7 @@ void RosbagProcessor::addRepublisher(const std::string& rosbag_topic_name,
                                      unsigned int queue_size,
                                      bool transient_local) {
   // NOTE: A generic publisher, so the message type does not have to be known
-  //       at compile time. ROS1 templated this on the message type; rosbag2
-  //       already carries the type name in its metadata, so it need not be.
+  //       at compile time.
   rclcpp::QoS qos(queue_size);
   if (transient_local) {
     qos.transient_local();
@@ -158,8 +156,7 @@ bool RosbagProcessor::processAll() {
         rclcpp::spin_some(node_.get_node_base_interface());
       }
 
-      // Drain the input queues. Replaces ROS1's reliance on a ros::Timer
-      // firing inside spinOnce(); see the note in rosbag_processor.h.
+      // Drain the input queues, see the note in rosbag_processor.h
       {
         ProfilerZoneScopedN("rosbagFlushQueues");
         for (const auto& flusher : queue_flushers_) {
@@ -169,9 +166,7 @@ bool RosbagProcessor::processAll() {
     }
   }
 
-  // The bag is exhausted, but the last batch of messages has not been drained
-  // yet. ROS1 left this to the retry timer during the post-processing spin;
-  // here it is explicit, so no pointcloud is silently dropped at the end.
+  // Drain the last batch of messages, so no pointcloud is dropped at the end
   for (const auto& flusher : queue_flushers_) {
     flusher();
   }

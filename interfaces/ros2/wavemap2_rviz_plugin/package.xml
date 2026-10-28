@@ -26,8 +26,7 @@
   <depend>pluginlib</depend>
   <depend>std_srvs</depend>
   <depend>qtbase5-dev</depend>
-  <!-- ROS1's rviz package also provided the executable. In ROS2 it is split
-       out, and the launch files' show_rviz starts it. -->
+  <!-- Started by the launch files when show_rviz is set -->
   <exec_depend>rviz2</exec_depend>
 
   <export>

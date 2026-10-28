@@ -57,14 +57,9 @@ class RosInputBase {
   const std::string& getTopicName() { return config_.topic_name; }
 
   // Drain the input's queue immediately, rather than waiting for the retry
-  // timer to fire.
-  //
-  // ROS1 drove processQueue() exclusively from a ros::Timer, which fires
-  // during ros::spinOnce(). The offline rosbag processor therefore depended
-  // on the simulated /clock it published itself being routed back to its own
-  // node before any queue was drained. Offline, that round-trip buys nothing
-  // and costs determinism, so the ROS2 processor calls this directly instead.
-  // The live node still uses the timer, exactly as ROS1 does.
+  // timer to fire
+  // NOTE: Used by the rosbag processor, whose timers would only fire once the
+  //       simulated /clock it publishes reached its own node.
   void processQueueNow() { processQueue(); }
 
  protected:

@@ -12,14 +12,11 @@
 
 namespace wavemap::param::convert {
 namespace {
-// Scalar type resolution deliberately follows PyYAML's YAML 1.1 implicit
-// resolver rather than yaml-cpp's own YAML 1.2 behaviour.
-//
-// This is not an arbitrary preference. ROS1 loaded these same files through
-// roslaunch's <rosparam> tag, which parses with PyYAML and pushes the result
-// onto the parameter server. So "what PyYAML would have produced" is exactly
-// "what the ROS1 converter received", and matching it is what makes a ROS1
-// user's config behave identically here.
+// Scalar type resolution follows PyYAML's YAML 1.1 implicit resolver rather
+// than yaml-cpp's own YAML 1.2 behaviour
+// NOTE: The ROS1 interface loads the same config files through roslaunch's
+//       <rosparam> tag, which parses them with PyYAML. Matching it makes
+//       configs behave identically on both interfaces.
 //
 // Places where the versions disagree, all of which these patterns resolve in
 // PyYAML's favour:
@@ -29,7 +26,6 @@ namespace {
 //   * a float without a leading digit takes no sign: `.5` is a float, but
 //     `-.5` and `+.5` are strings (`-0.5` is a float).
 //
-// The patterns were checked against PyYAML 6.0.3 on a table of ~75 scalars.
 // Known deviations from PyYAML, none of which appear in wavemap's shipped
 // configs:
 //   * sexagesimal numbers (`1:30`) and underscore digit separators (`1_000`)

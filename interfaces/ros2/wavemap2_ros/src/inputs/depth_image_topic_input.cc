@@ -157,9 +157,8 @@ void DepthImageTopicInput::publishProjectedPointcloudIfEnabled(
   }
 
   // TODO(victorr): Reimplement this
-  // NOTE: Carried over from ROS1 as-is, including the fact that it publishes
-  //       nothing. The topic is still advertised so that the set of topics a
-  //       given config produces matches ROS1's exactly.
+  // NOTE: Until then, this publishes nothing. The topic is still advertised,
+  //       so that a config produces the same topics on both interfaces.
 }
 
 PosedPointcloud<Point3D> DepthImageTopicInput::project(

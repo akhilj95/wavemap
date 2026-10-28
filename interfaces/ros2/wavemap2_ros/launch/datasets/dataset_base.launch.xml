@@ -14,8 +14,7 @@
   <arg name="bag_save_path" default="../catkin_ws/bags/evaluations"/>
   <arg name="bag_prefix" default="new_college_os0_cloister"/>
 
-  <!-- NOTE: Included launch files see all of our arguments, which is what
-             ROS1's pass_all_args did. -->
+  <!-- NOTE: Included launch files see all of our arguments. -->
 
   <!-- Process the rosbag with wavemap -->
   <group if="$(var use_batch_mode)">
@@ -28,8 +27,8 @@
   </group>
 
   <!-- Record rosbag -->
-  <!-- NOTE: ros2 bag record has no output-prefix option, so the timestamp that
-             ROS1 appended is added here, in the same format. -->
+  <!-- NOTE: ros2 bag record has no output-prefix option, so the timestamp is
+             appended here. -->
   <group if="$(var record_rosbag)">
     <executable name="rosbag_record"
                 cmd="ros2 bag record -o $(var bag_save_path)/$(var bag_prefix)_$(eval '__import__(\'time\').strftime(\'%Y-%m-%d-%H-%M-%S\')') --topics /wavemap/map_evaluation_summary /wavemap/performance_stats /wavemap/occupancy_grid /wavemap/occupancy_grid_error"

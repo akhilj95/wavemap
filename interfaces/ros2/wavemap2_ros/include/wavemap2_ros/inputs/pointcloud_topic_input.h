@@ -120,9 +120,8 @@ class PointcloudTopicInput : public RosInputBase {
   // config, so the subscription cannot be a
   // rclcpp::Subscription<ConcreteMsg>::SharedPtr member.
   rclcpp::SubscriptionBase::SharedPtr pointcloud_sub_;
-  // NOTE: No mutex, exactly as in ROS1, where the single-threaded spinner
-  //       serialized all callbacks. Preserving that requires running this node
-  //       under a SingleThreadedExecutor -- see app/ros_server.cc.
+  // NOTE: No mutex, since the node runs under a SingleThreadedExecutor, see
+  //       app/ros_server.cc.
   std::queue<undistortion::StampedPointcloud> pointcloud_queue_;
   void processQueue() override;
 

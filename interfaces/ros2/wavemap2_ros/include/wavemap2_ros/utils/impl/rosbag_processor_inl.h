@@ -10,10 +10,7 @@
 
 namespace wavemap {
 namespace detail {
-// Turn a bag's raw bytes back into a typed message.
-//
-// ROS1's rosbag::MessageInstance::instantiate<T>() did this. rosbag2 hands
-// out serialized buffers instead, so the deserialization is explicit.
+// Turn a bag's raw bytes back into a typed message
 template <typename MessageT>
 MessageT deserializeBagMessage(
     const rosbag2_storage::SerializedBagMessage& bag_message) {

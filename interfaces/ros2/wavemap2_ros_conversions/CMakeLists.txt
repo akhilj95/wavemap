@@ -55,8 +55,8 @@ target_include_directories(${PROJECT_NAME} PRIVATE src)
 if (BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
 
-  # Copies of the configs shipped for ROS1 double as test data: parity means
-  # a ROS1 user's existing file must parse unchanged.
+  # The example configs double as test data, since existing ROS1 configs must
+  # parse unchanged
   set(TEST_CONFIG_DIR "${CMAKE_CURRENT_SOURCE_DIR}/test/config")
 
   # The library is resolved through symlinks, since the documented workspace
@@ -75,16 +75,12 @@ if (BUILD_TESTING)
       kTestConfigDir="${TEST_CONFIG_DIR}")
   target_link_libraries(test_${PROJECT_NAME} ${PROJECT_NAME})
 
-  # Typed round-trip test (map -> msg -> map) over all 4 map types, ported
-  # from interfaces/ros1/wavemap_ros_conversions/test. Reuses the library's
-  # own test fixtures (FixtureBase, GeometryGenerator, ConfigGenerator)
-  # rather than duplicating them, same as the ROS1 CMakeLists does.
-  # TIMEOUT: the default is 60s. In a Release build (this package's default,
-  # also with DCHECK_ALWAYS_ON as in CI) the binary takes about 1s, but in an
-  # unoptimized one (measured with CMAKE_BUILD_TYPE=None) it took ~90s, since
-  # the round-trip has to walk every cell of the dense HashedBlocks map.
-  # Without this, such a build reports "did not generate a result file" while
-  # every assertion in the test actually passes.
+  # Round-trip test (map -> msg -> map) over all 4 map types, reusing the
+  # library's own test fixtures (FixtureBase, GeometryGenerator,
+  # ConfigGenerator)
+  # NOTE: The test takes about 1s in Release builds, but about 90s without
+  #       optimizations, since it walks every cell of the dense HashedBlocks
+  #       map. ament's default timeout of 60s would then fail it.
   ament_add_gtest(test_map_msg_${PROJECT_NAME}
       test/src/test_map_msg_conversions.cc
       TIMEOUT 300)

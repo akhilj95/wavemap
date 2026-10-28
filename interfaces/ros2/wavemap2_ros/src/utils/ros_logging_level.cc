@@ -20,9 +20,6 @@ void RosLoggingLevel::applyToGlog() const {
 }
 
 bool RosLoggingLevel::applyToRosConsole(const std::string& logger_name) const {
-  // NOTE: ROS1's ros::console::set_logger_level(...) had to be followed by
-  //       notifyLoggerLevelsChanged() to take effect. rcutils applies the
-  //       severity immediately, so there is no second call here.
   const rcutils_ret_t result = rcutils_logging_set_logger_level(
       logger_name.c_str(), ros_levels[toTypeId()]);
   if (result != RCUTILS_RET_OK) {

@@ -55,12 +55,10 @@ PointcloudTopicInput::PointcloudTopicInput(
       pointcloud_undistorter_(
           transformer,
           config_.num_undistortion_interpolation_intervals_per_cloud, logger_) {
-  // Subscribe to the pointcloud input.
+  // Subscribe to the pointcloud input
   // NOTE: SensorDataQoS (best effort) rather than the default Reliable. Most
   //       ROS2 sensor drivers publish best effort, and a Reliable subscriber
-  //       silently never connects to one. The history depth comes from
-  //       topic_queue_length, the same config field ROS1 used as its
-  //       subscriber queue length.
+  //       silently never connects to one.
   registerCallback(
       config_.topic_type,
       [this, &node](auto callback_ptr) {
@@ -121,12 +119,10 @@ void PointcloudTopicInput::callback(
     return;
   }
 
-  // Convert to our generic stamped pointcloud format.
-  // NOTE: The header stamp is wrapped with an explicit RCL_ROS_TIME. In ROS1,
-  //       header.stamp *was* a ros::Time; in ROS2 it is a
-  //       builtin_interfaces::msg::Time, and rclcpp::Time's default clock
-  //       type is RCL_SYSTEM_TIME, which would later throw when compared
-  //       against the RCL_ROS_TIME stamps we reconstruct from nanoseconds.
+  // Convert to our generic stamped pointcloud format
+  // NOTE: The header stamp is wrapped with an explicit RCL_ROS_TIME, since
+  //       rclcpp::Time's default RCL_SYSTEM_TIME would throw when compared
+  //       against the RCL_ROS_TIME stamps reconstructed from nanoseconds.
   const uint64_t stamp_nsec = convert::rosTimeToNanoSeconds(
       rclcpp::Time(pointcloud_msg.header.stamp, RCL_ROS_TIME) +
       rclcpp::Duration::from_seconds(config_.time_offset));
@@ -290,14 +286,9 @@ void PointcloudTopicInput::processQueue() {
     }
 
     // Integrate the pointcloud
-    // NOTE: timebase_ns is this cloud's own (bag/sim) timestamp, logged as a
-    //       raw integer (not seconds-as-double, which a stream's default
-    //       precision rounds to ~6 significant digits -- not enough to tell
-    //       sub-second timestamps apart) so the first few clouds of a run
-    //       can be compared against ROS1's equivalent sim-time (ROS1 gets
-    //       this for free from rosconsole's [wall, sim] prefix; ROS2's
-    //       console output only carries wall time, so it has to be logged
-    //       explicitly here).
+    // NOTE: The cloud's timestamp is logged since ROS2's console output only
+    //       carries wall time. It is logged in integer nanoseconds, since a
+    //       stream's default precision cannot tell sub-second stamps apart.
     const uint64_t timebase_ns = oldest_msg.getTimeBase();
     RCLCPP_DEBUG_STREAM(logger_, "Inserting pointcloud with "
                                      << posed_pointcloud.size()
@@ -348,9 +339,8 @@ void PointcloudTopicInput::publishProjectedRangeImageIfEnabled(
   }
 
   // TODO(victorr): Reimplement this
-  // NOTE: Carried over from ROS1 as-is, including the fact that it publishes
-  //       nothing. The topic is still advertised so that the set of topics a
-  //       given config produces matches ROS1's exactly.
+  // NOTE: Until then, this publishes nothing. The topic is still advertised,
+  //       so that a config produces the same topics on both interfaces.
 }
 
 void PointcloudTopicInput::publishUndistortedPointcloudIfEnabled(

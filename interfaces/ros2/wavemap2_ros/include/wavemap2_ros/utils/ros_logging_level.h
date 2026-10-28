@@ -9,10 +9,8 @@
 #include <wavemap/core/utils/logging_level.h>
 
 namespace wavemap {
-// Port of interfaces/ros1/wavemap_ros/include/wavemap_ros/utils/
-// ros_logging_level.h. The type names and their YAML spellings are part of the
-// config schema (`general.logging_level`), so they are unchanged; only the
-// backend differs: rosconsole is replaced by rcutils' logging severities.
+// NOTE: The type names are part of the config schema (`general.logging_level`)
+//       shared with the ROS1 interface.
 struct RosLoggingLevel : public TypeSelector<RosLoggingLevel> {
   using TypeSelector<RosLoggingLevel>::TypeSelector;
 
@@ -28,13 +26,10 @@ struct RosLoggingLevel : public TypeSelector<RosLoggingLevel> {
   // Conversion to general LoggingLevel (from the C++ Library)
   operator LoggingLevel() const;  // NOLINT
 
-  // Apply the logger level to a given output.
-  // NOTE: ROS1 defaulted to ROSCONSOLE_DEFAULT_NAME, which is package-scoped.
-  //       ROS2 has no equivalent: loggers are named after the node. An empty
-  //       name addresses rcutils' default logger, which is the setting every
-  //       node-specific logger falls back to, so it is the closest analogue to
-  //       "wavemap's own log output". Callers that have a node pass its
-  //       logger name instead.
+  // Apply the logger level to a given output
+  // NOTE: An empty name addresses rcutils' default logger, which every
+  //       node-specific logger falls back to. Callers that have a node pass
+  //       its logger name instead.
   bool applyToRosConsole(const std::string& logger_name = "") const;
   void applyToGlog() const;
 };

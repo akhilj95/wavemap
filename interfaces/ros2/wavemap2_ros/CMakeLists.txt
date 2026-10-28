@@ -13,7 +13,7 @@ endif ()
 
 # Find dependencies
 # NOTE: OpenCV is normally included through cv_bridge, but we still explicitly
-#       include it to avoid issues on Jetson. Mirrors the ROS1 package.
+#       include it to avoid issues on Jetson.
 find_package(OpenCV REQUIRED)
 find_package(ament_cmake REQUIRED)
 find_package(wavemap2 REQUIRED)
@@ -33,8 +33,8 @@ find_package(geometry_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
 
 # Optional dependencies
-# Mirrors interfaces/ros1/wavemap_ros/CMakeLists.txt:24-28. A missing Livox
-# driver must degrade to a skipped feature, never to a build break.
+# NOTE: Without the Livox driver, Livox inputs are disabled rather than
+#       breaking the build.
 find_package(livox_ros_driver2 QUIET)
 if (livox_ros_driver2_FOUND)
   message(STATUS "Found livox_ros_driver2: enabling Livox pointcloud input.")

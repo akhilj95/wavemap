@@ -1,8 +1,7 @@
 <launch>
   <!-- General arguments -->
-  <!-- NOTE: ROS1's default pointed at config/wavemap_server.yaml, which
-             does not exist. Left empty here, which the node rejects. It
-             cannot be a required arg: ROS2 only counts required args passed
+  <!-- NOTE: Left empty by default, which the node rejects. It cannot be a
+             required arg, since ROS2 only counts required args passed
              explicitly by an include, not ones inherited from the parent. -->
   <arg name="param_file"
        default=""
@@ -24,22 +23,20 @@
        default=""
        description="Replay the rosbag(s) at the specified path(s), separated by spaces."/>
 
-  <!-- ROS1 nodes ran in ROS_HOME, so relative rosbag paths resolved there.
-       ROS2 processes run in the launching shell's directory instead. -->
+  <!-- Resolve relative rosbag paths w.r.t. ROS_HOME (default ~/.ros) -->
   <let name="ros_home" value="$(env ROS_HOME $(env HOME)/.ros)"/>
   <let name="rosbag_path_resolved"
        value="$(eval '\' \'.join(__import__(\'os\').path.join(\'$(var ros_home)\', p) for p in \'$(var rosbag_path)\'.split())')"/>
 
   <!-- Process the rosbag with wavemap as fast as possible -->
-  <!-- NOTE: ROS1 set the global /use_sim_time here. ROS2 has no global
-             params, so it is passed to every node below instead. -->
+  <!-- NOTE: ROS2 has no global params, so use_sim_time is passed to every
+             node below. -->
   <group>
     <let if="$(var debug_mode)" name="launch_prefix"
          value="gdb -ex run --args"/>
     <let unless="$(var debug_mode)" name="launch_prefix" value=""/>
 
-    <!-- NOTE: ROS1's required="$(arg exit_when_done)". ROS2's on_exit does
-               not take substitutions, hence the two variants. -->
+    <!-- NOTE: on_exit does not take substitutions, hence the two variants. -->
     <node if="$(var exit_when_done)" on_exit="shutdown"
           name="wavemap" pkg="wavemap2_ros"
           exec="rosbag_processor"

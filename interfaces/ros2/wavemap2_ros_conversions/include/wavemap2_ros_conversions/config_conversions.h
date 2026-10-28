@@ -8,19 +8,11 @@
 #include <rclcpp/logger.hpp>
 #include <wavemap/core/config/config_base.h>
 
-// Replaces ROS1's XmlRpc-based converter
-// (interfaces/ros1/wavemap_ros_conversions/src/config_conversions.cc).
-//
-// ROS1 got arbitrarily nested config for free: roslaunch's <rosparam file>
-// tag loads a whole YAML tree onto the parameter server as an
-// XmlRpc::XmlRpcValue. ROS2's parameter system cannot represent a list of
-// heterogeneous dicts, which wavemap's `map_operations:` and `inputs:`
-// sections both are, so we parse the YAML file ourselves and hand the
-// resulting tree to the same param::Value API the ROS1 path used.
-//
-// The YAML schema is unchanged: a ROS1 user's existing config file works
-// as-is.
-//
+// Load wavemap's YAML config files as param::Value trees
+// NOTE: ROS2's parameter system cannot represent a list of heterogeneous
+//       dicts, which wavemap's `map_operations:` and `inputs:` sections both
+//       are, so the config files are parsed directly. Their schema is the same
+//       as for ROS1, so existing config files work unchanged.
 // NOTE: yaml-cpp is deliberately absent from this header. The node-level
 //       overloads live in src/yaml_node_conversions.h, which is not
 //       installed, so yaml-cpp stays a private dependency and does not leak

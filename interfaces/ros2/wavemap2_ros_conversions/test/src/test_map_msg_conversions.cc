@@ -27,10 +27,9 @@ class MapMsgConversionsTest : public FixtureBase,
                               public ConfigGenerator {
  protected:
   void SetUp() override {
-    // Deliberately RCL_ROS_TIME, not the rclcpp::Time default of
-    // RCL_SYSTEM_TIME: this mirrors what a real node's clock produces, and
-    // is what nanoSecondsToRosTime() in time_conversions.h defaults to as
-    // well (see progress.md for why that default matters).
+    // NOTE: RCL_ROS_TIME rather than rclcpp::Time's default RCL_SYSTEM_TIME,
+    //       as produced by a real node's clock. rclcpp throws when comparing
+    //       times of different clock types, see time_conversions.h.
     stamp = rclcpp::Clock{RCL_ROS_TIME}.now();
   }
 

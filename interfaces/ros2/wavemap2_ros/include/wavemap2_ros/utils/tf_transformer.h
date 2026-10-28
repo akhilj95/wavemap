@@ -12,8 +12,6 @@
 #include <wavemap/core/common.h>
 
 namespace wavemap {
-// Port of interfaces/ros1/wavemap_ros/include/wavemap_ros/utils/
-// tf_transformer.h.
 class TfTransformer {
  public:
   // Subscribes to /tf and /tf_static through a TransformListener, using the
@@ -57,10 +55,9 @@ class TfTransformer {
   std::unique_ptr<tf2_ros::TransformListener> tf_listener_;
 
   // Transform lookup timers
-  // NOTE: These are deliberately wall-clock, as in ROS1, where they were
-  //       ros::WallDuration. They pace a retry loop that waits for another
-  //       thread to fill the buffer, so they must keep ticking even when sim
-  //       time is paused.
+  // NOTE: These are wall-clock durations. They pace a retry loop that waits
+  //       for another thread to fill the buffer, so they must keep ticking
+  //       even when sim time is paused.
   // Timeout between each update attempt
   static constexpr std::chrono::duration<double> transform_lookup_retry_period_{
       0.02};

@@ -13,10 +13,8 @@
 #include "wavemap2_ros/utils/tf_transformer.h"
 
 namespace wavemap {
-// Port of interfaces/ros1/wavemap_ros/include/wavemap_ros/utils/
-// pointcloud_undistorter.h. Unchanged apart from the TF timestamp type: the
-// undistortion maths itself lives in the library
-// (wavemap/core/utils/undistortion/), not here.
+// NOTE: The undistortion maths lives in the library, in
+//       wavemap/core/utils/undistortion/.
 class PointcloudUndistorter {
  public:
   enum class Result {

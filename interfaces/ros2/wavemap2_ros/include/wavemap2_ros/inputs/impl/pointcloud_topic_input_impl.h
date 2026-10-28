@@ -4,14 +4,10 @@
 namespace wavemap {
 namespace detail {
 // Recovers the message type from a PointcloudTopicInput::callback overload's
-// pointer-to-member type.
-//
-// ROS1's registrar received a pointer-to-member and handed it straight to
-// nh.subscribe(topic, queue, ptr, this), which deduced the message type
-// itself. ROS2's create_subscription<MessageT>() takes the message type as an
-// explicit template argument instead, so the registrar has to name it. This
-// trait lets it, while keeping registerCallback's shape identical to ROS1's.
-// Declaration only: it is used solely inside decltype().
+// pointer-to-member type
+// NOTE: create_subscription<MessageT>() takes the message type as an explicit
+//       template argument, so the registrar has to name it. Declaration
+//       only: it is used solely inside decltype().
 template <typename ClassT, typename MessageT>
 MessageT pointcloudCallbackMessageType(void (ClassT::*)(const MessageT&));
 }  // namespace detail

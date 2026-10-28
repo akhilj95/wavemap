@@ -56,8 +56,11 @@ To process one or more rosbags as fast as possible, use:
 ros2 launch wavemap2_ros rosbag_processor.launch.xml param_file:=/path/to/your_config.yaml rosbag_path:="/path/to/first_bag /path/to/second_bag"
 ```
 
-The rosbag processor reads the bags directly rather than subscribing to topics, so it is deterministic and does not depend on the [DDS settings](dds.md).
+The rosbag processor reads its pointclouds and depth images directly from the bags rather than subscribing to topics, so it does not depend on the [DDS settings](dds.md).
+It is not deterministic, however: the bags' transforms reach wavemap through its own TF listener, so whether a measurement's pose has arrived in time depends on timing, and repeated runs on the same bags can integrate a different number of measurements.
 It takes the sensor poses from a live `TransformListener`, so transforms that are not in the bags, such as static sensor extrinsics, must be published while it runs.
+The poses must therefore be on `/tf` in the bags, or be published by nodes started alongside it, such as `static_transform_publisher`.
+Poses recorded only as `nav_msgs/Odometry` or `geometry_msgs/PoseStamped` messages, or stored in CSV files, are not converted; ROS1's `odom_msg_to_tf.py`, `csv_to_tf.py` and `extract_tfs_from_bags.py` scripts are intentionally not ported.
 As in ROS1, it stays alive once it is done, so the map can be inspected in Rviz2, unless `show_rviz:=false` is set, in which case it exits.
 
 ## Live inputs

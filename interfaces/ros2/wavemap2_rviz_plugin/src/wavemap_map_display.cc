@@ -203,9 +203,8 @@ bool WavemapMapDisplay::connectServiceClient(
 
 // NOTE: The services are called asynchronously, as RViz2 spins its node on the
 //       GUI thread and a blocking call would freeze the interface until the
-//       server responds. This also means there is no equivalent of ROS1's
-//       "exists but could not be called" failure; a server that stops
-//       responding simply leaves the request pending.
+//       server responds. A server that stops responding therefore leaves the
+//       request pending rather than reporting an error.
 void WavemapMapDisplay::requestWavemapServerResetCallback() {
   ProfilerZoneScoped;
   // Resolve name of the service based on the map topic

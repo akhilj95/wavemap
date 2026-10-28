@@ -18,13 +18,8 @@
 #include <wavemap/core/utils/thread_pool.h>
 #include <wavemap2_msgs/msg/map.hpp>
 
-// Port of interfaces/ros1/wavemap_ros_conversions, same algorithms throughout.
-// Besides ros::Time -> rclcpp::Time and wavemap_msgs::* ->
-// wavemap2_msgs::msg::*, it differs in that it
-// - supports both octree node layouts wavemap2_msgs can be built with (see
-//   map_msg_layout.h)
-// - checks that the octree nodes it deserializes form valid octrees, which is
-//   why the octree rosMsgToMap() overloads return bool instead of void
+// NOTE: These support both octree node layouts wavemap2_msgs can be built
+//       with, see map_msg_layout.h.
 namespace wavemap::convert {
 bool mapToRosMsg(const MapBase& map, const std::string& frame_id,
                  const rclcpp::Time& stamp, wavemap2_msgs::msg::Map& msg,

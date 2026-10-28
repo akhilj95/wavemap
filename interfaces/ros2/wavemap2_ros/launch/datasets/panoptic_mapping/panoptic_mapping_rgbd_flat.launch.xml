@@ -13,7 +13,7 @@
   <!-- NOTE: Relative paths will be resolved w.r.t. ROS_HOME (default ~/.ros) -->
   <arg name="base_path"
        default="../data/panoptic_mapping/flat_dataset/run1"/>
-  <!-- NOTE: Only used in batch mode. ROS2 bags are directories, not .bag files like in ROS1. -->
+  <!-- NOTE: Only used in batch mode. ROS2 bags are directories. -->
   <arg name="rosbag_path"
        default="$(var base_path)/run1_ros2"
        description="Rosbag2 directory to ingest in batch mode. Relative paths are resolved w.r.t. ROS_HOME."/>

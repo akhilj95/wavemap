@@ -73,7 +73,8 @@ Cyclone DDS uses UDP between processes by default, so it does not drop large poi
 
 Use the `flat` [map message layout](map_message_layout.md) with Cyclone DDS, which is the default.
 With the `nested` layout, Cyclone DDS serializes each map's octree nodes one at a time.
-In our tests, its maps then arrived about 200 ms after they were stamped, against 50 to 65 ms with Fast DDS, and since wavemap pauses mapping while it publishes, every map publish delayed mapping by more than 100 ms.
+In our tests, publishing a 30 MB map then took about 80 ms instead of about 10 ms with the `flat` layout, and wavemap pauses mapping while it publishes.
+Its maps also arrived about 200 ms after they were stamped, against 50 to 65 ms with Fast DDS.
 With the `flat` layout, Cyclone DDS delivered maps slightly faster than Fast DDS.
 
 ### Wavemap's Cyclone DDS config

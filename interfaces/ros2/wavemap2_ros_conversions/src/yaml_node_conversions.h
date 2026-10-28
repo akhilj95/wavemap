@@ -6,8 +6,7 @@
 #include <yaml-cpp/yaml.h>
 
 // Internal header: not installed, so that yaml-cpp remains a private
-// dependency of this package. Mirrors the XmlRpcValue overloads in ROS1's
-// interfaces/ros1/wavemap_ros_conversions/src/config_conversions.cc.
+// dependency of this package.
 namespace wavemap::param::convert {
 param::Map toParamMap(const YAML::Node& node, const rclcpp::Logger& logger);
 param::Array toParamArray(const YAML::Node& node, const rclcpp::Logger& logger);

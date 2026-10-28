@@ -39,12 +39,7 @@ std::string typeOf(const std::string& scalar) {
 }  // namespace
 
 // Scalar resolution must follow PyYAML's YAML 1.1 rules, not yaml-cpp's
-// native YAML 1.2 ones, because ROS1 loaded these same files via roslaunch's
-// <rosparam> tag, which parses with PyYAML. Matching PyYAML is what makes a
-// ROS1 user's existing config behave identically here.
-//
-// Every expectation below was verified against PyYAML directly rather than
-// assumed.
+// native YAML 1.2 ones, see config_conversions.cc
 TEST(ConfigConversions, Yaml11BooleansMatchPyYaml) {
   EXPECT_EQ(typeOf("yes"), "bool:true");
   EXPECT_EQ(typeOf("no"), "bool:false");
@@ -149,9 +144,8 @@ TEST(ConfigConversions, MalformedYamlIsReportedNotSilentlyEmpty) {
       param::convert::yamlStringToParams("key: [unclosed").has_value());
 }
 
-// Every config shipped for ROS1 must parse unchanged, since user-facing
-// parity is the whole point: a ROS1 user points general.config_file at the
-// same file they already have. test/config holds copies of those configs.
+// Every config shipped for ROS1 must parse unchanged, so that existing
+// config files can be reused. test/config holds copies of those configs.
 TEST(ConfigConversions, AllShippedRos1ConfigsParse) {
   const std::filesystem::path config_dir{kTestConfigDir};
   ASSERT_TRUE(std::filesystem::is_directory(config_dir))

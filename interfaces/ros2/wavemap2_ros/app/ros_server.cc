@@ -16,10 +16,9 @@ int main(int argc, char** argv) {
   auto node = std::make_shared<rclcpp::Node>("wavemap");
   wavemap::RosServer wavemap_server(*node);
 
-  // NOTE: Single-threaded, and not incidentally. PointcloudTopicInput's
-  //       pointcloud_queue_ has no mutex, because ROS1's single-threaded
-  //       spinner serialized every callback. A MultiThreadedExecutor here
-  //       would race the subscription callback against the retry timer.
+  // NOTE: Single-threaded on purpose. The inputs' queues have no mutex, so a
+  //       MultiThreadedExecutor would race their subscription callbacks
+  //       against their retry timers.
   rclcpp::executors::SingleThreadedExecutor executor;
   executor.add_node(node);
   executor.spin();

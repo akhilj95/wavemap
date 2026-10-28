@@ -17,34 +17,22 @@
 #include <rosgraph_msgs/msg/clock.hpp>
 
 namespace wavemap {
-// Port of interfaces/ros1/wavemap_ros/include/wavemap_ros/utils/
-// rosbag_processor.h, on top of rosbag2_cpp::Reader.
+// Reads rosbags with rosbag2_cpp::Reader and feeds their messages to wavemap
 //
-// TF is handled exactly as in ROS1: /tf and /tf_static are republished from
-// the bag onto the live topics of the same name via addRepublisher(), and
-// the node's own TransformListener (see TfTransformer) picks them back up,
-// same as it would for a live robot. This means the run is not
-// bit-reproducible -- whether a given transform has arrived by the time a
-// given pointcloud is looked up depends on wall-clock scheduling of the
-// round-trip through the ROS graph, exactly as in ROS1 (confirmed: 9 runs of
-// this processor on the same bag integrated 4 different cloud counts, see
-// progress.md). That was a deliberate, explicit trade against an earlier
-// design that injected TF straight into the buffer and was bit-deterministic
-// -- reproducing ROS1's exact behavior (including its nondeterminism) was
-// judged more valuable than the determinism, since it lets any launch-time
-// static transform publisher work unmodified in batch mode too, with no
-// generated bag or special-cased static-only path required.
+// Multiple bags are merged chronologically, so that e.g. odometry and sensor
+// data recorded in separate bags interleave for the TF lookups to resolve.
 //
-// One departure from ROS1 remains: input queues are drained through
-// addQueueFlusher() immediately after the messages that filled them, instead
-// of waiting for a ros::Timer to fire during spinOnce(). ROS1's timer only
-// fired once the simulated /clock this same process published had travelled
-// back to it.
+// /tf and /tf_static are republished from the bags via addRepublisher(), and
+// picked back up by the node's own TransformListener (see TfTransformer), as
+// for a live robot. This lets launch-time static transform publishers work in
+// batch mode too, but makes runs non-reproducible: whether a transform has
+// arrived by the time a pointcloud is looked up depends on how the round-trip
+// through the ROS graph is scheduled.
 //
-// Multiple bags are merged chronologically, which is what ROS1's
-// rosbag::View did across its queries. This matters for the Newer College
-// setup, where odometry and sensor data live in separate bags and have to
-// interleave by timestamp for the TF lookups to resolve.
+// Input queues are drained through addQueueFlusher() right after the messages
+// that filled them, rather than by the inputs' retry timers, which would only
+// fire once the simulated /clock published by this process reached its own
+// node.
 class RosbagProcessor {
  public:
   explicit RosbagProcessor(rclcpp::Node& node) : node_(node) {}
@@ -69,13 +57,9 @@ class RosbagProcessor {
     queue_flushers_.emplace_back(std::move(flusher));
   }
 
-  // NOTE on transient_local: tf2_ros::TransformListener subscribes to
-  // /tf_static requesting TRANSIENT_LOCAL durability. The default VOLATILE
-  // publisher this would otherwise create is QoS-incompatible with that
-  // subscription -- ros2 bag play hits the exact same mismatch when replaying
-  // a bag whose /tf_static was not recorded as transient_local (see
-  // issues.md, "/tf_static QoS"). Pass transient_local=true when
-  // republishing /tf_static for that reason.
+  // NOTE: tf2_ros::TransformListener subscribes to /tf_static with
+  //       TRANSIENT_LOCAL durability, which a VOLATILE publisher cannot serve.
+  //       Pass transient_local=true when republishing /tf_static.
   void addRepublisher(const std::string& rosbag_topic_name,
                       const std::string& republished_topic_name,
                       const std::string& message_type, unsigned int queue_size,

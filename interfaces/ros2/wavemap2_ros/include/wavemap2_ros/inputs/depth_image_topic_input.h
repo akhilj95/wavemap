@@ -89,9 +89,8 @@ class DepthImageTopicInput : public RosInputBase {
   Stopwatch integration_timer_;
 
   image_transport::Subscriber depth_image_sub_;
-  // NOTE: No mutex, for the same reason as in PointcloudTopicInput: the node
-  //       runs under a SingleThreadedExecutor, as ROS1 ran a single-threaded
-  //       spinner.
+  // NOTE: No mutex, since the node runs under a SingleThreadedExecutor, see
+  //       app/ros_server.cc.
   std::queue<sensor_msgs::msg::Image> depth_image_queue_;
   void processQueue() override;
 

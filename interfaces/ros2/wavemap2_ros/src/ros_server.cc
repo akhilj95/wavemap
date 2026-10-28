@@ -16,14 +16,9 @@
 
 namespace wavemap {
 namespace {
-// Pull one top-level section out of the config tree.
-//
-// ROS1 fetched each section from the parameter server separately and warned,
-// then returned an empty map/array, when it was missing
-// (interfaces/ros1/wavemap_ros_conversions/src/config_conversions.cc:6-37).
-// The sections now come from one parsed file instead, but the
-// missing-section behaviour is kept identical so that a partial config
-// behaves the same on both interfaces.
+// Pull one top-level section out of the config tree
+// NOTE: Missing sections are warned about and treated as empty, as on the
+//       ROS1 interface, so that partial configs behave the same on both.
 param::Value getSection(const param::Value& params, const std::string& name,
                         const rclcpp::Logger& logger) {
   if (const auto child = params.getChild(name); child) {
@@ -256,11 +251,8 @@ void RosServer::advertiseServices(rclcpp::Node& node) {
   using Trigger = std_srvs::srv::Trigger;
   using FilePath = wavemap2_msgs::srv::FilePath;
 
-  // NOTE: The "~/" prefixes are load-bearing. ROS1 advertised these through
-  //       nh_private, whose namespace is the node name; ROS2 resolves a
-  //       relative name against the node's namespace instead. Without the
-  //       tilde these would land at /reset_map rather than
-  //       /wavemap/reset_map.
+  // NOTE: privateName() puts these in the node's private namespace, e.g.
+  //       /wavemap/reset_map rather than /reset_map.
   reset_map_srv_ = node.create_service<Trigger>(
       privateName("reset_map"),
       [this](const std::shared_ptr<Trigger::Request> /*request*/,

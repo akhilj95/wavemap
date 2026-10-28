@@ -1,8 +1,7 @@
 <launch>
   <!-- General arguments -->
-  <!-- NOTE: ROS1's default pointed at config/wavemap_server.yaml, which
-             does not exist. Left empty here, which the node rejects. It
-             cannot be a required arg: ROS2 only counts required args passed
+  <!-- NOTE: Left empty by default, which the node rejects. It cannot be a
+             required arg, since ROS2 only counts required args passed
              explicitly by an include, not ones inherited from the parent. -->
   <arg name="param_file"
        default=""
@@ -25,11 +24,10 @@
        default="0"
        description="Skip the first n seconds of the rosbag."/>
 
-  <!-- ROS1 set the global /use_sim_time when replaying a rosbag. ROS2 has no
-       global params, so it is passed to every node below instead. -->
+  <!-- Use sim time when replaying a rosbag
+       NOTE: ROS2 has no global params, so it is passed to every node below. -->
   <let name="use_sim_time" value="$(eval '\'$(var rosbag_path)\' != \'\'')"/>
-  <!-- ROS1 nodes ran in ROS_HOME, so relative rosbag paths resolved there.
-       ROS2 processes run in the launching shell's directory instead. -->
+  <!-- Resolve relative rosbag paths w.r.t. ROS_HOME (default ~/.ros) -->
   <let name="ros_home" value="$(env ROS_HOME $(env HOME)/.ros)"/>
 
   <!-- Play the rosbag if a path was specified -->

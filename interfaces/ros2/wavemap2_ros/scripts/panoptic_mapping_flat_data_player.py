@@ -2,9 +2,6 @@
 
 # All credits go to:
 # https://github.com/ethz-asl/panoptic_mapping
-#
-# ROS2 port of interfaces/ros1/wavemap_ros/scripts/
-# panoptic_mapping_flat_data_player.py.
 
 import os
 import csv
@@ -28,8 +25,7 @@ from std_srvs.srv import Empty
 def quaternion_from_matrix(matrix):
     """Return the (x, y, z, w) quaternion of a 4x4 homogeneous transform.
 
-    Stands in for ROS1's tf.transformations.quaternion_from_matrix, which has
-    no ROS2 counterpart.
+    Implemented here so that the script needs no extra dependency.
     """
     m = np.asarray(matrix, dtype=np.float64)[:3, :3]
     trace = np.trace(m)
@@ -67,8 +63,8 @@ class FlatDataPlayer(Node):
         super().__init__('flat_data_player')
 
         # params
-        # NOTE: Dynamically typed, since ROS2 would otherwise reject e.g. an
-        #       integer play_rate:=2 that ROS1 accepted.
+        # NOTE: Dynamically typed, so that e.g. an integer play_rate:=2 is
+        #       accepted where a float is expected.
         def param(name, default):
             return self.declare_parameter(
                 name, default, ParameterDescriptor(dynamic_typing=True)).value
@@ -135,7 +131,7 @@ class FlatDataPlayer(Node):
         return response
 
     def shutdown(self, reason):
-        # Replaces rospy.signal_shutdown(); main() stops spinning on this.
+        # main() stops spinning once this is called
         self.get_logger().info(reason)
         self.done = True
 

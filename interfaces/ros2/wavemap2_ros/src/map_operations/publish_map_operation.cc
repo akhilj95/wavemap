@@ -39,9 +39,9 @@ PublishMapOperation::PublishMapOperation(
       clock_(node.get_clock()),
       last_run_timestamp_(0, 0, clock_->get_clock_type()),
       conversions_logger_(node.get_logger().get_child("conversions")) {
-  // NOTE: Default QoS, i.e. reliable, matching ROS1's TCP transport. Map
-  //       updates are incremental, so a dropped message would leave its blocks
-  //       missing downstream until the next full retransmission.
+  // NOTE: Reliable QoS, since map updates are incremental and a dropped
+  //       message would leave its blocks missing downstream until the next
+  //       full retransmission.
   map_pub_ = node.create_publisher<wavemap2_msgs::msg::Map>(
       privateName(config_.topic), rclcpp::QoS(10));
   // Subscribers can only read the maps if their wavemap2_msgs was built with

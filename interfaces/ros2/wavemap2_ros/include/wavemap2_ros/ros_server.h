@@ -48,25 +48,19 @@ struct RosServerConfig : ConfigBase<RosServerConfig, 4, RosLoggingLevel> {
 
 class RosServer {
  public:
-  // The name of the ROS2 parameter holding the path to wavemap's YAML config.
-  //
-  // This single string parameter replaces ROS1's <rosparam file="..."> tag.
-  // ROS2's parameter system cannot represent a list of heterogeneous dicts,
-  // which `map_operations:` and `inputs:` both are, so the file is read
-  // directly instead of being pushed through the parameter server. The YAML
-  // schema is unchanged: a ROS1 user's config file works as-is.
+  // The name of the ROS2 parameter holding the path to wavemap's YAML config
+  // NOTE: ROS2's parameter system cannot represent a list of heterogeneous
+  //       dicts, which `map_operations:` and `inputs:` both are, so the file
+  //       is read directly. Its schema is the same as for ROS1.
   static constexpr const char* kConfigFileParamName = "general.config_file";
 
   // Reads kConfigFileParamName and loads the config file it points at.
-  // Throws std::runtime_error if the file is missing or unparseable, matching
-  // ROS1, where a failed RosServerConfig::from(...) threw out of the
-  // constructor and ended the program.
+  // Throws std::runtime_error if the file is missing or unparseable.
   //
   // `transformer` is optional. Passing nullptr (the default) makes the server
-  // build its own TfTransformer, which subscribes to /tf and /tf_static like
-  // ROS1's did. The offline rosbag processor passes a listener-free
-  // transformer instead, so that a stray /tf publisher elsewhere on the
-  // network cannot perturb an otherwise deterministic replay.
+  // build its own TfTransformer, which subscribes to /tf and /tf_static. The
+  // rosbag processor passes its own, whose TF buffer uses a system clock, see
+  // TfTransformer.
   explicit RosServer(rclcpp::Node& node,
                      std::shared_ptr<TfTransformer> transformer = nullptr);
   RosServer(rclcpp::Node& node, const param::Value& params,

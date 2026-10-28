@@ -10,9 +10,7 @@
 
 namespace wavemap {
 namespace {
-// tf2 measures its cache time as a tf2::Duration, so the config's float
-// seconds have to be converted rather than passed through as ROS1 did with
-// ros::Duration(float).
+// Convert the config's float seconds to the tf2::Duration tf2 expects
 tf2::Duration toTf2Duration(FloatingPoint seconds) {
   return std::chrono::duration_cast<tf2::Duration>(
       std::chrono::duration<FloatingPoint>(seconds));
@@ -49,8 +47,7 @@ bool TfTransformer::waitForTransform(const std::string& to_frame_id,
 
 std::optional<Transformation3D> TfTransformer::lookupLatestTransform(
     const std::string& to_frame_id, const std::string& from_frame_id) {
-  // NOTE: tf2 treats the zero time point as "the latest available transform",
-  //       exactly as ROS1's default-constructed ros::Time{} did.
+  // NOTE: tf2 treats the zero time point as "the latest available transform".
   return lookupTransformImpl(sanitizeFrameId(to_frame_id),
                              sanitizeFrameId(from_frame_id),
                              tf2::TimePointZero);

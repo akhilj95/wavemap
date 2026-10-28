@@ -35,8 +35,7 @@ struct CropMapOperationConfig : public ConfigBase<CropMapOperationConfig, 3> {
 
 class CropMapOperation : public MapOperationBase {
  public:
-  // NOTE: Unlike ROS1, this takes the node, for its clock. ROS1 read the
-  //       global ros::Time::now(), which ROS2 does not have.
+  // NOTE: Takes the node for its clock.
   CropMapOperation(const CropMapOperationConfig& config,
                    MapBase::Ptr occupancy_map,
                    std::shared_ptr<TfTransformer> transformer,

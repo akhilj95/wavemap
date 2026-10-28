@@ -13,19 +13,15 @@ sensor_msgs::msg::PointCloud2 toPointCloud2Msg(
 
   sensor_msgs::PointCloud2Modifier modifier(msg);
   // NOTE: Fields are listed out rather than using
-  //       setPointCloud2FieldsByString(1, "xyz"), which looks equivalent but
-  //       is not: it pads point_step out to 16 bytes, whereas ROS1's
-  //       conversion produced a tightly packed 12. Verified by diffing the
-  //       two messages, not assumed.
+  //       setPointCloud2FieldsByString(1, "xyz"), which pads point_step out to
+  //       16 bytes instead of a tightly packed 12.
   modifier.setPointCloud2Fields(3, "x", 1,
                                 sensor_msgs::msg::PointField::FLOAT32, "y", 1,
                                 sensor_msgs::msg::PointField::FLOAT32, "z", 1,
                                 sensor_msgs::msg::PointField::FLOAT32);
   modifier.resize(points.size());
   // NOTE: resize() sets height to 1, width to the point count and row_step
-  //       accordingly. is_bigendian and is_dense keep their default-
-  //       constructed value of false, matching what the deprecated
-  //       PointCloud conversion wrote.
+  //       accordingly.
 
   sensor_msgs::PointCloud2Iterator<float> it(msg, "x");
   for (const auto& point : points) {

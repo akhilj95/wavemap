@@ -1,9 +1,7 @@
 # Pulled in by ament_package(CONFIG_EXTRAS ...), so this runs in the scope of
 # every downstream package that does find_package(wavemap2).
-#
-# It mirrors library/cpp/cmake/wavemap-config.cmake.in, which serves the same
-# purpose for pure-CMake consumers, and the manual dependency shims in
-# interfaces/ros1/wavemap/CMakeLists.txt for catkin consumers.
+# NOTE: This is the ament counterpart of the library's
+#       cmake/wavemap-config.cmake.in, and should be kept in sync with it.
 
 include(CMakeFindDependencyMacro)
 

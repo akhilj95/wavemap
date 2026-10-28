@@ -24,13 +24,10 @@ int main(int argc, char** argv) {
 
   auto node = std::make_shared<rclcpp::Node>("wavemap");
 
-  // Live TransformListener, as in ROS1, so launch-time nodes like
-  // static_transform_publisher work unmodified in batch mode too. The buffer
-  // clock is a standalone RCL_SYSTEM_TIME clock rather than node->get_clock():
-  // under use_sim_time, tf2_ros::Buffer clears every *dynamic* transform the
-  // moment the node's own clock switches from system to ROS time, i.e. the
-  // instant the first /clock message lands (its static cache survives that
-  // clear). See TfTransformer's two-arg constructor.
+  // Use a live TransformListener, so that launch-time nodes such as
+  // static_transform_publisher also work in batch mode
+  // NOTE: The buffer uses its own RCL_SYSTEM_TIME clock rather than the
+  //       node's, see TfTransformer's two-arg constructor.
   auto transformer = std::make_shared<TfTransformer>(
       *node, std::make_shared<rclcpp::Clock>(RCL_SYSTEM_TIME));
 
@@ -41,9 +38,9 @@ int main(int argc, char** argv) {
   const std::string rosbag_paths_str =
       node->declare_parameter<std::string>("rosbag_path", "");
   const bool keep_alive = node->declare_parameter<bool>("keep_alive", false);
-  // NOTE: ROS1 relied on rosbag_processor.launch's required rosbag_path arg
-  //       for this. The ROS2 launch file cannot make it required (included
-  //       launch files only count explicitly passed required args).
+  // NOTE: Checked here since the launch file cannot make rosbag_path a
+  //       required arg (included launch files only count explicitly passed
+  //       required args).
   if (rosbag_paths_str.find_first_not_of(" \t\n") == std::string::npos) {
     RCLCPP_ERROR(node->get_logger(),
                  "ROS parameter \"rosbag_path\" is not set. It must list "
@@ -93,14 +90,11 @@ int main(int argc, char** argv) {
     ++input_idx;
   }
 
-  // Republish TFs, exactly as ROS1's rosbag_processor.cc does: the bag's /tf
-  // and /tf_static go back out onto the live topics of the same name, for
-  // our own TransformListener (inside transformer) to pick up. The
-  // republished /tf_static is created transient_local regardless of how the
-  // bag itself recorded that topic -- see the note on addRepublisher() --
-  // so a bag recorded as volatile (issues.md, "/tf_static QoS") works here
-  // even though it silently drops every static transform under
-  // `ros2 bag play`.
+  // Republish the bags' TFs for our own TransformListener to pick up
+  // NOTE: /tf_static is republished as transient_local regardless of how the
+  //       bags recorded it, see addRepublisher(). Bags whose /tf_static was
+  //       recorded as volatile therefore work here, although `ros2 bag play`
+  //       silently drops their static transforms.
   rosbag_processor.addRepublisher("/tf", "/tf", "tf2_msgs/msg/TFMessage", 10);
   rosbag_processor.addRepublisher("/tf_static", "/tf_static",
                                   "tf2_msgs/msg/TFMessage", 10,
@@ -133,8 +127,8 @@ int main(int argc, char** argv) {
             << "\n* Map size: "
             << wavemap_server.getMap()->getMemoryUsage() / 1024 << " kB\n";
 
-  // NOTE: The map is written out through the save_map service, exactly as in
-  //       ROS1. Run with keep_alive:=true and call
+  // NOTE: The map can be saved through the save_map service. Run with
+  //       keep_alive:=true and call
   //       `ros2 service call /wavemap/save_map wavemap2_msgs/srv/FilePath
   //        "{file_path: /path/to/map.wvmp}"`.
   if (keep_alive) {

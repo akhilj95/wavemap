@@ -112,9 +112,7 @@ class WavemapMapDisplay
   // Service clients to call wavemap's reset and full map republish services
   inline static const std::string kResetWavemapServerService = "reset_map";
   // NOTE: The server advertises the full map republish service under the map
-  //       topic's name plus this suffix (see PublishMapOperation). The ROS1
-  //       plugin called "<namespace>/republish_whole_map" instead, which no
-  //       server advertises, so its "Full map update" button never connected.
+  //       topic's name plus this suffix, see PublishMapOperation.
   inline static const std::string kRequestFullMapSuffix = "_request_full";
   static std::optional<std::string> resolveWavemapServerNamespaceFromMapTopic(
       const std::string& map_topic, const std::string& child_topic = "");

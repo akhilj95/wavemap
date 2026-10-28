@@ -8,11 +8,9 @@
 #include <geometry_msgs/msg/vector3.hpp>
 #include <wavemap/core/common.h>
 
-// NOTE: ROS1 routed these through eigen_conversions (tf::pointMsgToEigen and
-//       friends). The ROS2 equivalent would be tf2_eigen, but every one of
-//       these is a three-field copy, and tf2_eigen's toMsg() overloads are
-//       ambiguous between Point and Vector3 for the same Eigen::Vector3d.
-//       Writing them out drops a dependency and removes that ambiguity.
+// NOTE: These are written out rather than using tf2_eigen, whose toMsg()
+//       overloads are ambiguous between Point and Vector3 for the same
+//       Eigen::Vector3d. This also saves a dependency.
 namespace wavemap::convert {
 inline Point3D pointMsgToPoint3D(const geometry_msgs::msg::Point& msg) {
   return {static_cast<FloatingPoint>(msg.x), static_cast<FloatingPoint>(msg.y),

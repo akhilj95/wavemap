@@ -32,11 +32,10 @@ RosInputBase::RosInputBase(const RosInputBaseConfig& config,
       transformer_(std::move(transformer)),
       world_frame_(std::move(world_frame)),
       logger_(node.get_logger()) {
-  // Start the queue processing retry timer.
-  // NOTE: node.get_clock() rather than create_wall_timer(). ROS1's
-  //       nh.createTimer() respected /use_sim_time, and every dataset replay
-  //       runs on sim time, so a wall timer here would retry at the wrong rate
-  //       whenever the bag is replayed faster or slower than real time.
+  // Start the queue processing retry timer
+  // NOTE: Uses the node's clock rather than a wall timer, so that the retry
+  //       rate follows sim time when bags are replayed faster or slower than
+  //       real time.
   queue_processing_retry_timer_ = rclcpp::create_timer(
       &node, node.get_clock(),
       rclcpp::Duration::from_seconds(config_.processing_retry_period),

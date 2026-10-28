@@ -22,13 +22,9 @@
        description="Whether to process the rosbag in batch mode or replay the rosbag. Batch mode requires a rosbag with pre-processed odometry."/>
 
   <!-- Frames and calibrations -->
-  <!-- NOTE: tf2_ros's static_transform_publisher latches its output onto
-             /tf_static once, unlike ROS1's pkg="tf" equivalent, which
-             republished onto /tf every 100ms. A live TransformListener, used
-             by the server in real-time mode and now also by the rosbag
-             processor in batch mode (see rosbag_processor.h), picks up a
-             latched static fine either way, so there was no reason to keep
-             ROS1's repeated-republish workaround. -->
+  <!-- NOTE: These latch their transforms onto /tf_static, which both the
+             server and the rosbag processor pick up through their
+             TransformListeners. -->
   <node pkg="tf2_ros" exec="static_transform_publisher"
         name="static_tf_odom_camera_init"
         args="--frame-id odom --child-frame-id camera_init"/>

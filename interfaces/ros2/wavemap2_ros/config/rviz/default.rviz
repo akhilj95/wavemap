@@ -1,9 +1,3 @@
-# RViz2 port of interfaces/ros1/wavemap_ros/config/rviz/default.rviz.
-# NOTE: ROS1's disabled Image and RobotModel displays and its SetInitialPose,
-#       SetGoal and PublishPoint tools are not carried over.
-# NOTE: ROS1's map display set "Show grid"/"Show slice" options that its
-#       plugin no longer has, so RViz1 ignored them and used the defaults.
-#       They are left out here, which gives the same result.
 Panels:
   - Class: rviz_common/Displays
     Help Height: 0
