@@ -121,5 +121,8 @@ ament_export_dependencies(
     rclcpp tf2_ros tf2_msgs image_transport cv_bridge OpenCV
     rosbag2_cpp rosbag2_storage rosgraph_msgs
     std_srvs sensor_msgs geometry_msgs visualization_msgs)
+if (livox_ros_driver2_FOUND)
+  ament_export_dependencies(livox_ros_driver2)
+endif ()
 
 ament_package()
