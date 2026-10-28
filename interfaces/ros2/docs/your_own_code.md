@@ -87,7 +87,9 @@ int main(int argc, char** argv) {
   auto node = std::make_shared<rclcpp::Node>("your_node");
 
   // Subscribe to the map published by wavemap's server
-  const rclcpp::QoS qos(1);
+  // NOTE: For hashed maps, the server only sends the blocks that changed, so
+  //       keep a queue as deep as the server's (10).
+  const rclcpp::QoS qos(10);
   auto map_sub = node->create_subscription<wavemap2_msgs::msg::Map>(
       "/wavemap/map", qos, &mapCallback);
 

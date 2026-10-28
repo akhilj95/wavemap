@@ -109,11 +109,13 @@ void PointcloudTopicInput::callback(
   if (x_field_iter == pointcloud_msg.fields.end()) {
     RCLCPP_WARN(logger_, "Received pointcloud with missing field x");
     return;
-  } else if ((++x_field_iter)->name != "y") {
+  } else if (++x_field_iter == pointcloud_msg.fields.end() ||
+             x_field_iter->name != "y") {
     RCLCPP_WARN(logger_,
                 "Received pointcloud with missing or out-of-order field y");
     return;
-  } else if ((++x_field_iter)->name != "z") {
+  } else if (++x_field_iter == pointcloud_msg.fields.end() ||
+             x_field_iter->name != "z") {
     RCLCPP_WARN(logger_,
                 "Received pointcloud with missing or out-of-order field z");
     return;
